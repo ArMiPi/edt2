@@ -1,7 +1,7 @@
 #ifndef _XY2TREE__
 #define XY2TREE__
 
-#include "lista.h"
+//#include "lista.h"
 #include <stdbool.h>
 
 
@@ -80,7 +80,7 @@ Node insertXyyT (XyyTree t, double x, double y, Info i);
  * Retorna um indicador para o no' inserido.
  */
 
-Node getNodeXyyT (XyyTreet, double x, double y, double epsilon);
+Node getNodeXyyT (XyyTree t, double x, double y, double epsilon);
 /*
  * Retorna o n� cuja ancora seja o ponto (x,y). Aceita-se uma pequena discrep�ncia
  * entre a coordenada da ancora (anc.x,anc.y) e o ponto (x,y) de epsilon unidades.

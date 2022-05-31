@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "string": "c",
+        "forms.h": "c",
+        "stdlib.h": "c",
+        "strings.h": "c",
+        "stdbool.h": "c"
+    }
+}
