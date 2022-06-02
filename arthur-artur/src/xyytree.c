@@ -8,7 +8,7 @@
 #include"enum.c"
 
 // Constante de erro aceitado para comparação de double
-#define EPSILON 0.0000009
+// #define EPSILON 0.0000009
 
 typedef struct _node {
     struct _node* parent;
@@ -121,7 +121,42 @@ double getNodeY(Node node) {
         - Retorna um ponteiro para o nó no qual i foi inserida
 */
 Node insertNode(Node node, double x, double y, Info i) {
-    
+    // Coordenadas x e y da forma no nó atual
+    double xNode = getNodeX(node);
+    double yNode = getNodeY(node);
+
+    NODE *nd = (NODE *) node;
+    Node nextNode;
+    if(x < xNode) {
+        nextNode = nd->left;
+        if(nextNode != NULL) return insertNode(nextNode, x, y, i);
+
+        // Criar e posicionar novo nó
+        Node *insertedNode = newNode(i);
+        nd->left = insertedNode;
+
+        return insertedNode;
+    }
+    else if(y < yNode) {
+        nextNode = nd->center;
+        if(nextNode != NULL) return insertNode(nextNode, x, y, i);
+
+        // Criar e posicionar novo nó
+        Node *insertedNode = newNode(i);
+        nd->center = insertedNode;
+        
+        return insertedNode;
+    }
+    else {
+        nextNode = nd->right;
+        if(nextNode != NULL) return insertNode(nextNode, x, y, i);
+
+        // Criar e posicionar novo nó
+        Node *insertedNode = newNode(i);
+        nd->right = insertedNode;
+
+        return insertedNode;
+    }
 }
 
 Node insertXyyTree(XyyTree t, double x, double y, Info i) {
@@ -139,4 +174,10 @@ Node insertXyyTree(XyyTree t, double x, double y, Info i) {
     }
 
     return inserted;
+}
+
+Node getNodeXyyT(XyyTree t, double x, double y, double epsilon) {
+    if(t == NULL) return NULL;
+
+    
 }
