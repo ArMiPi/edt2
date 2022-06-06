@@ -87,4 +87,13 @@ Condition getFormCondition(Form form);
 */
 String getFormForm(Form form);
 
+/*
+	# Entrada:
+		- form: Forma
+	
+	# Descrição:
+		- Libera a memória utilizada por form
+*/
+void destroyForm(Form form);
+
 #endif
