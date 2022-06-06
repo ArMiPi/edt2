@@ -199,38 +199,79 @@ Node insertXyyTree(XyyTree t, double x, double y, Info i)
     return inserted;
 }
 
+/*
+    # Entradas:
+        - node: Nó de uma XyyTree
+        - x, y: Coordenada âncora da figura procurada
+        - epsilon: Erro aceito na comparação de double
+    
+    # Saída:
+        - Node: Nó contendo a forma procurada
+    
+    # Descrição:
+        - Retorna o nó que armazena a forma com ponto âncora na
+          coordenada (x, y)
+*/
+Node searchXyyTree(Node node, double x, double y, double epsilon)
+{
+    if(node == NULL) 
+        return NULL;
+
+    double nodeX = getNodeX(node);
+    double nodeY = getNodeY(node);
+
+    double deltaX = nodeX - x;
+    deltaX = (deltaX < 0) ? (deltaX * -1) : deltaX;
+    double deltaY = nodeY - y;
+    deltaY = (deltaY < 0) ? (deltaY * -1) : deltaY;
+
+    NODE *nd = (NODE *) node;
+    if(deltaX <= epsilon && deltaY <= epsilon)
+        return node;
+    else if(x < nodeX) 
+        return searchXyyTree(nd->left, x, y, epsilon);
+    else if(y < nodeY)
+        return searchXyyTree(nd->center, x, y, epsilon);
+    
+    return searchXyyTree(nd->right, x, y, epsilon);
+}
+
 Node getNodeXyyT(XyyTree t, double x, double y, double epsilon)
 {
     if (t == NULL)
         return NULL;
+
+    XYYTREE *tree = (XYYTREE *) t;
+
+    return searchXyyTree(tree->head, x, y, epsilon);
 }
 
 // ------------------------------------------
 
-void removeNoXyyT(XyyTree t, Node n);
-{
-}
+// void removeNoXyyT(XyyTree t, Node n);
+// {
+// }
 
-Info getInfoXyyT(XyyTree t, Node n);
-{
-}
+// Info getInfoXyyT(XyyTree t, Node n);
+// {
+// }
 
-Lista getNodesDentroRegiaoXyyT(XyyTree t, double x1, double y1, double x2, double y2);
-{
-}
+// Lista getNodesDentroRegiaoXyyT(XyyTree t, double x1, double y1, double x2, double y2);
+// {
+// }
 
-Lista getInfosDentroRegiaoXyyT(XyyTree t, double x1, double y1, double x2, double y2, FdentroDe f);
-{
-}
+// Lista getInfosDentroRegiaoXyyT(XyyTree t, double x1, double y1, double x2, double y2, FdentroDe f);
+// {
+// }
 
-Lista getInfosAtingidoPontoXyyT(XyyTree t, double x, double y, FatingidoPor f);
-{
-}
+// Lista getInfosAtingidoPontoXyyT(XyyTree t, double x, double y, FatingidoPor f);
+// {
+// }
 
-void visitaProfundidadeXyyT(XyyTree t, FvisitaNo f, void *aux);
-{
-}
+// void visitaProfundidadeXyyT(XyyTree t, FvisitaNo f, void *aux);
+// {
+// }
 
-void visitaLarguraXyyT(XyyTree t, FvisitaNo f, void *aux);
-{
-}
+// void visitaLarguraXyyT(XyyTree t, FvisitaNo f, void *aux);
+// {
+// }
