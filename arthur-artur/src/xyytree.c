@@ -48,15 +48,12 @@ XyyTree newXyyTree(double fd)
 /*
     # Entrada:
         - t: XyyTree
-
     # Saída:
         - true
         - false
-
     # Descrição:
         - Retorna true caso a árvore esteja vazia,
           false caso contrário
-
         - t != NULL
 */
 bool isTreeEmpty(XyyTree t)
@@ -72,10 +69,8 @@ bool isTreeEmpty(XyyTree t)
 /*
     # Entrada:
         - info: Informação a ser armazenada no nó
-
     # Saída:
         - Node: Nó criado
-
     # Descrição:
         - Cria um nó e armazena nele a informação passada
 */
@@ -123,13 +118,10 @@ double getNodeY(Node node)
         - node: Nó de uma XyyTree
         - x, y: Coordenadas de forma a ser inserida na árvore
         - i: Informação a ser criada no nó que será inserido
-
     # Saída:
         - Node: Nó criado
-
     # Descrição:
         - Percorre a árvore e insere i na posição correta
-
         - Retorna um ponteiro para o nó no qual i foi inserida
 */
 Node insertNode(Node node, double x, double y, Info i)
@@ -204,17 +196,17 @@ Node insertXyyT(XyyTree t, double x, double y, Info i)
         - node: Nó de uma XyyTree
         - x, y: Coordenada âncora da figura procurada
         - epsilon: Erro aceito na comparação de double
-    
+
     # Saída:
         - Node: Nó contendo a forma procurada
-    
+
     # Descrição:
         - Retorna o nó que armazena a forma com ponto âncora na
           coordenada (x, y)
 */
 Node searchXyyTree(Node node, double x, double y, double epsilon)
 {
-    if(node == NULL) 
+    if (node == NULL)
         return NULL;
 
     double nodeX = getNodeX(node);
@@ -225,14 +217,14 @@ Node searchXyyTree(Node node, double x, double y, double epsilon)
     double deltaY = nodeY - y;
     deltaY = (deltaY < 0) ? (deltaY * -1) : deltaY;
 
-    NODE *nd = (NODE *) node;
-    if(deltaX <= epsilon && deltaY <= epsilon)
+    NODE *nd = (NODE *)node;
+    if (deltaX <= epsilon && deltaY <= epsilon)
         return node;
-    else if(x < nodeX) 
+    else if (x < nodeX)
         return searchXyyTree(nd->left, x, y, epsilon);
-    else if(y < nodeY)
+    else if (y < nodeY)
         return searchXyyTree(nd->center, x, y, epsilon);
-    
+
     return searchXyyTree(nd->right, x, y, epsilon);
 }
 
@@ -241,37 +233,44 @@ Node getNodeXyyT(XyyTree t, double x, double y, double epsilon)
     if (t == NULL)
         return NULL;
 
-    XYYTREE *tree = (XYYTREE *) t;
+    XYYTREE *tree = (XYYTREE *)t;
 
     return searchXyyTree(tree->head, x, y, epsilon);
 }
 
 // ------------------------------------------
 
-// void removeNoXyyT(XyyTree t, Node n);
-// {
-// }
+void removeNoXyyT(XyyTree t, Node n)
+{
+    // TODO:
+}
 
-// Info getInfoXyyT(XyyTree t, Node n);
-// {
-// }
+Info getInfoXyyT(XyyTree t, Node n)
+{
+    // TODO:
+}
 
-// Lista getNodesDentroRegiaoXyyT(XyyTree t, double x1, double y1, double x2, double y2);
-// {
-// }
+List *getNodesDentroRegiaoXyyT(XyyTree t, double x1, double y1, double x2, double y2)
+{
+    // TODO:
+}
 
-// Lista getInfosDentroRegiaoXyyT(XyyTree t, double x1, double y1, double x2, double y2, FdentroDe f);
-// {
-// }
+List *getInfosDentroRegiaoXyyT(XyyTree t, double x1, double y1, double x2, double y2, FdentroDe f)
+{
+    // TODO:
+}
 
-// Lista getInfosAtingidoPontoXyyT(XyyTree t, double x, double y, FatingidoPor f);
-// {
-// }
+List *getInfosAtingidoPontoXyyT(XyyTree t, double x, double y, FatingidoPor f)
+{
+    // TODO:
+}
 
-// void visitaProfundidadeXyyT(XyyTree t, FvisitaNo f, void *aux);
-// {
-// }
+void visitaProfundidadeXyyT(XyyTree t, FvisitaNo f, void *aux)
+{
+    // TODO:
+}
 
-// void visitaLarguraXyyT(XyyTree t, FvisitaNo f, void *aux);
-// {
-// }
+void visitaLarguraXyyT(XyyTree t, FvisitaNo f, void *aux)
+{
+    // TODO:
+}
