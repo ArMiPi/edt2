@@ -5,7 +5,7 @@
 #include "strings.h"
 #include "forms.h"
 
-#include "enum.c"
+#include "enum.h"
 
 // Constante de erro aceitado para comparação de double
 // #define EPSILON 0.0000009
@@ -147,7 +147,7 @@ Node insertNode(Node node, double x, double y, Info i)
             return insertNode(nextNode, x, y, i);
 
         // Criar e posicionar novo nó
-        Node *insertedNode = newNode(i);
+        Node insertedNode = newNode(i);
         nd->left = insertedNode;
 
         return insertedNode;
@@ -159,7 +159,7 @@ Node insertNode(Node node, double x, double y, Info i)
             return insertNode(nextNode, x, y, i);
 
         // Criar e posicionar novo nó
-        Node *insertedNode = newNode(i);
+        Node insertedNode = newNode(i);
         nd->center = insertedNode;
 
         return insertedNode;
@@ -171,14 +171,14 @@ Node insertNode(Node node, double x, double y, Info i)
             return insertNode(nextNode, x, y, i);
 
         // Criar e posicionar novo nó
-        Node *insertedNode = newNode(i);
+        Node insertedNode = newNode(i);
         nd->right = insertedNode;
 
         return insertedNode;
     }
 }
 
-Node insertXyyTree(XyyTree t, double x, double y, Info i)
+Node insertXyyT(XyyTree t, double x, double y, Info i)
 {
     if (t == NULL || i == NULL)
         return NULL;
