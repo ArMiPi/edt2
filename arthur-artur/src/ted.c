@@ -3,6 +3,7 @@
 
 #include "params.h"
 #include "strings.h"
+#include "database.h"
 
 int main(int argc, char *argv[]) 
 {
@@ -10,8 +11,8 @@ int main(int argc, char *argv[])
     Params prms = newParams(argc, argv);
 
     // Ler e armazenar informações do .geo
+    Database geo = readData(getBED(prms), getGEO(prms));
     
-
     // Criar .svg a partir do .geo
     
 
