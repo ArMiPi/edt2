@@ -2,7 +2,7 @@
 #define FORMS_H
 
 #include"strings.h"
-#include"enum.c"
+#include"enum.h"
 
 /*
     - Esse módulo tem por objetivo definir funções para melhor manipular as formas

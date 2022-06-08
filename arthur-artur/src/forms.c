@@ -25,8 +25,8 @@ Form newForm(String command)
 
     String *splt = split(command, " ");
 
-    frm->x = strtod(splt[1], NULL);
-    frm->y = strtod(splt[2], NULL);
+    frm->x = strtod(splt[2], NULL);
+    frm->y = strtod(splt[3], NULL);
     frm->condition = alive;
     frm->form = command;
 
@@ -105,7 +105,7 @@ void destroyForm(Form form)
 
     if(forma->form != NULL)
         free(forma->form);
-    free(forma->form);
+    free(forma);
 
     form = NULL;
 }
