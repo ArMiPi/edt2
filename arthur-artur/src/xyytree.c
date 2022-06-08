@@ -2,13 +2,14 @@
 #include <stdlib.h>
 
 #include "xyytree.h"
+#include "list.h"
 #include "strings.h"
 #include "forms.h"
 
 #include "enum.c"
 
 // Constante de erro aceitado para comparação de double
-// #define EPSILON 0.0000009
+#define EPSILON 0.0000009
 
 typedef struct _node
 {
@@ -32,7 +33,7 @@ XyyTree newXyyTree(double fd)
     XYYTREE *tree = (XYYTREE *)malloc(sizeof(XYYTREE));
     if (tree == NULL)
     {
-        printf("ERROR: Could not allocate memory for new XyyTree\n");
+        printf("ERRO: Não foi possível alocar memória para a nova Árvore Xyy\n");
         exit(EXIT_FAILURE);
     }
 
@@ -207,30 +208,37 @@ Node getNodeXyyT(XyyTree t, double x, double y, double epsilon)
 
 // ------------------------------------------
 
-void removeNoXyyT(XyyTree t, Node n);
+void removeNoXyyT(XyyTree t, Node n)
 {
+    // ...
 }
 
-Info getInfoXyyT(XyyTree t, Node n);
+Info getInfoXyyT(XyyTree t, Node n)
 {
+    // ...
 }
 
-Lista getNodesDentroRegiaoXyyT(XyyTree t, double x1, double y1, double x2, double y2);
+List *getNodesDentroRegiaoXyyT(XyyTree t, double x1, double y1, double x2, double y2)
 {
+    // ...
 }
 
-Lista getInfosDentroRegiaoXyyT(XyyTree t, double x1, double y1, double x2, double y2, FdentroDe f);
+List *getInfosDentroRegiaoXyyT(XyyTree t, double x1, double y1, double x2, double y2, FdentroDe f)
 {
+    // ...
 }
 
-Lista getInfosAtingidoPontoXyyT(XyyTree t, double x, double y, FatingidoPor f);
+List *getInfosAtingidoPontoXyyT(XyyTree t, double x, double y, FatingidoPor f)
 {
+    // ...
 }
 
-void visitaProfundidadeXyyT(XyyTree t, FvisitaNo f, void *aux);
+void visitaProfundidadeXyyT(XyyTree t, FvisitaNo f, void *aux)
 {
+    // ...
 }
 
-void visitaLarguraXyyT(XyyTree t, FvisitaNo f, void *aux);
+void visitaLarguraXyyT(XyyTree t, FvisitaNo f, void *aux)
 {
+    // ...
 }
