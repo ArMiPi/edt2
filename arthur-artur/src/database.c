@@ -54,9 +54,7 @@ XyyTree readFile(FILE *fptr)
         
         form = newForm(data);
 
-        insertXyyT(tree, getFormX(form), getFormY(form), data);
-
-        destryForm(form);
+        insertXyyT(tree, getFormX(form), getFormY(form), form);
     }
     
     free(line);
@@ -147,8 +145,8 @@ void destroyDB(Database db)
     if(DB->name) 
         free(DB->name);
     // REDO
-    if(DB->data != NULL) 
-        DestroyList(DB->data, &free);
+    // if(DB->data != NULL) 
+    //     DestroyList(DB->data, &free);
     free(DB);
 
     DB = NULL;
