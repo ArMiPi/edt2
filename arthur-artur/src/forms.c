@@ -12,6 +12,49 @@ typedef struct _form
     String form;            // Comando para criação da figura
 } FORM;
 
+/*
+    # Entadas:
+        - x1, y1: Coordenadas de um ponto (p1)
+        - x2, y2: Coordenadas de outro ponto (p2)
+    
+    # Saídas:
+        - -1
+        - 0
+        - 1
+    
+    # Descrição:
+        - Retorna 0 caso os pontos sejam iguais
+
+        - Retorna 1 caso p1 > p2
+
+        - Retorna -1 caso p1 < p2
+
+        - p1 será considerado maior que p2 se a coordenada x de
+          p1 for maior que a coordenada x de p2.
+          Caso ambos tenham a mesma coordenada x, a comparação será
+          realizada com base na coordenada y
+*/
+int comparePoints(double x1, double y1, double x2, double y2) 
+{
+    double deltaX = ((x1 - x2) > 0) ? x1 - x2 : x2 - x1;
+    double deltaY = ((y1 - y2) > 0) ? y1 - y2 : y2 - y1;
+    double epsilon = 0.000010;
+
+    // x1 == x2 && y1 == y2
+    if(deltaX < epsilon && deltaY < epsilon) 
+        return 0;
+    // x1 == x2 && y1 < y2
+    else if(deltaX < epsilon && y1 < y2) 
+        return -1;
+    // x1 == x2 && y1 > y2
+    else if(deltaX < epsilon && y1 > y2)
+        return 1;
+    else if(x1 < x2)
+        return -1;
+    else
+        return 1;
+}
+
 Form newForm(String command) 
 {
     if(command == NULL) return NULL;
@@ -25,11 +68,38 @@ Form newForm(String command)
 
     String *splt = split(command, " ");
 
-    frm->x = strtod(splt[2], NULL);
-    frm->y = strtod(splt[3], NULL);
+    // Coordenada âncora
+    if(strcmp(splt[0], "l") == 0) 
+    {
+        double x1 = strtod(splt[2], NULL);
+        double y1 = strtod(splt[3], NULL);
+        double x2 = strtod(splt[4], NULL);
+        double y2 = strtod(splt[5], NULL);
+
+        if(comparePoints(x1, y1, x2, y2) == -1)
+        {
+            frm->x = x1;
+            frm->y = y1;
+        }
+        else
+        {
+            frm->x = x2;
+            frm->y = y2;
+        }
+    }
+    else 
+    {
+        frm->x = strtod(splt[2], NULL);
+        frm->y = strtod(splt[3], NULL);
+    }
+
+    // Condição
     frm->condition = alive;
+
+    // Comando de criação
     frm->form = command;
 
+    // Nível de proteção
     if(strcmp(splt[0], "c") == 0) 
         frm->protection = 60;
     else if(strcmp(splt[0], "r") == 0) 
