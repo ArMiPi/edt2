@@ -17,10 +17,8 @@ int main(int argc, char *argv[])
     // Criar .svg a partir do .geo
     generateSVG(getBSD(prms), getDBname(geo), getDBdata(geo));
 
-    if(getQRY(prms) != NULL) {
-        // Ler e armazenar informações do .qry
-        Database qry = readData(getBED(prms), getQRY(prms));
-
+    if(getQRY(prms) != NULL) 
+    {
         // Executar comandos do .qry
         
 
