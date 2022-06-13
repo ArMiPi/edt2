@@ -1,13 +1,14 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define FILL_OPACITY "0.5"
 #define FONT_SIZE "5"
 #define LINE_HEIGHT "0"
 #define STROKE_WIDTH "2"
 
-#include"svg.h"
+#include "svg.h"
+#include "forms.h"
 
 /*
     # Entradas:
@@ -174,6 +175,29 @@ void drawText(FILE *fptr, String *splt)
     free(txto);
 }
 
+void draw(Info i, double x, double y, void *aux)
+{
+    if(i == NULL)
+        return;
+    
+    String command = getFormForm(i);
+
+    String *splt = split(command, " ");
+
+    if(strcmp(splt[0], "c") == 0)
+        drawCircle((FILE *) aux, splt);
+    else if(strcmp(splt[0], "r") == 0)
+        drawRectangle((FILE *) aux, splt);
+    else if(strcmp(splt[0], "l") == 0)
+        drawLine((FILE *) aux, splt);
+    else if(strcmp(splt[0], "t") == 0)
+        drawText((FILE *) aux, splt);
+    
+    for(int i = 0; splt[i] != NULL; i++)
+        free(splt[i]);
+    free(splt);
+}
+
 void generateSVG(String path, String name, XyyTree data) 
 {
     if(path == NULL || name == NULL || data == NULL) 
@@ -183,8 +207,7 @@ void generateSVG(String path, String name, XyyTree data)
     if(fptr == NULL) 
         return;
 
-    String *splt;
-    // TODO: Percorrer árvore lendo os comandos e inserindo eles no .svg
+    visitaProfundidadeXyyT(data, &draw, fptr);
 
     fprintf(fptr, "</svg>");
 
