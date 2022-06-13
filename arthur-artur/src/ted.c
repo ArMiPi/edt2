@@ -4,6 +4,7 @@
 #include "params.h"
 #include "strings.h"
 #include "database.h"
+#include "svg.h"
 
 int main(int argc, char *argv[]) 
 {
@@ -14,11 +15,11 @@ int main(int argc, char *argv[])
     Database geo = readData(getBED(prms), getGEO(prms));
     
     // Criar .svg a partir do .geo
-    
+    generateSVG(getBSD(prms), getDBname(geo), getDBdata(geo));
 
     if(getQRY(prms) != NULL) {
         // Ler e armazenar informações do .qry
-        
+        Database qry = readData(getBED(prms), getQRY(prms));
 
         // Executar comandos do .qry
         
