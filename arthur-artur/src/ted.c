@@ -24,5 +24,6 @@ int main(int argc, char *argv[])
 
     }
 
-    destroyParams(prms);    
+    destroyParams(prms);
+    destroyDB(geo);  
 }
