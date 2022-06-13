@@ -93,6 +93,17 @@ Node newNode(Info info)
     return node;
 }
 
+/*
+    # Entrada:
+        - node: Nó da XyyTree
+    
+    # Saída:
+        - double
+    
+    # Descrição:
+        - Retorna a coordenada x da
+          da forma armazenada em node
+*/
 double getNodeX(Node node)
 {
     if (node == NULL)
@@ -103,6 +114,17 @@ double getNodeX(Node node)
     return getFormX(nd->data);
 }
 
+/*
+    # Entrada:
+        - node: Nó da XyyTree
+    
+    # Saída:
+        - double
+    
+    # Descrição:
+        - Retorna a coordenada y da
+          da forma armazenada em node
+*/
 double getNodeY(Node node)
 {
     if (node == NULL)

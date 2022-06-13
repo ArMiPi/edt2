@@ -175,6 +175,16 @@ void drawText(FILE *fptr, String *splt)
     free(txto);
 }
 
+/*
+    # Entradas:
+        - i: Forma amazenada em data
+        - x, y: Coordenada âncora de i
+        - aux: Ponteiro para arquivo .svg
+    
+    # Descrição:
+        - Identifica a forma indicada por i e a insere
+          no arquivo .svg indicado por aux
+*/
 void draw(Info i, double x, double y, void *aux)
 {
     if(i == NULL)
