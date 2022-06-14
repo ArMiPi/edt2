@@ -64,7 +64,7 @@ int listSize(List lst)
 
     int size = 0;
 
-    for (List li = GetFirstItem(lst); li != NULL; li = GetNextItem(li))
+    for (Node li = getFirstItem(lst); li != NULL; li = getNextItem(li))
         size++;
 
     return size;
@@ -78,12 +78,12 @@ Node insertStart(List lst, Info info)
     LIST *l = (LIST *)lst;
 
     // Criar novo item
-    NODE *lli = NewItem();
+    NODE *lli = newItem();
     lli->info = info;
     lli->next = l->head;
 
     // Posicionar novo item
-    if (!IsListEmpty(lst))
+    if (!isListEmpty(lst))
         l->head->prev = lli;
     l->head = lli;
 
@@ -99,15 +99,15 @@ Node insertEnd(List lst, Info info)
     if (lst == NULL || info == NULL)
         return NULL;
 
-    if (IsListEmpty(lst))
-        return InsertStart(lst, info);
+    if (isListEmpty(lst))
+        return insertStart(lst, info);
 
     // Criar novo item
-    NODE *lli = NewItem();
+    NODE *lli = newItem();
     lli->info = info;
 
     // Posicionar novo item
-    NODE *last = GetLastItem(lst);
+    NODE *last = getLastItem(lst);
     last->next = lli;
     lli->prev = last;
 
@@ -123,11 +123,11 @@ Node insertAfter(List lst, Node li, Info info)
     if (lst == NULL || li == NULL || info == NULL)
         return NULL;
 
-    if (GetLastItem(lst) == li)
-        return InsertEnd(lst, info);
+    if (getLastItem(lst) == li)
+        return insertEnd(lst, info);
 
     // Criar novo item
-    NODE *lli = NewItem();
+    NODE *lli = newItem();
     lli->info = info;
 
     // Posicionar item
@@ -147,11 +147,11 @@ Node insertBefore(List lst, Node li, Info info)
     if (lst == NULL || li == NULL || info == NULL)
         return NULL;
 
-    if (GetFirstItem(lst) == li)
-        return InsertStart(lst, info);
+    if (getFirstItem(lst) == li)
+        return insertStart(lst, info);
 
     // Criar novo item
-    NODE *lli = NewItem();
+    NODE *lli = newItem();
     lli->info = info;
 
     // Posicionar item
@@ -171,19 +171,19 @@ Info removeItem(List lst, Node li)
     if (lst == NULL || li == NULL)
         return NULL;
 
-    if (IsListEmpty(lst))
+    if (isListEmpty(lst))
         return NULL;
 
     // Armazenar elemento que deve ser retornado
-    Info info = GetItemElement(li);
+    Info info = getItemElement(li);
 
     // Remover elemento da lista
     LIST *l = (LIST *)lst;
     NODE *lli = (NODE *)li;
 
-    if (GetFirstItem(lst) == li)
+    if (getFirstItem(lst) == li)
         l->head = l->head->next;
-    if (GetLastItem(lst) == li)
+    if (getLastItem(lst) == li)
         l->tail = l->tail->prev;
     if (lli->prev != NULL)
         lli->prev->next = lli->next;
@@ -224,7 +224,7 @@ Node getLastItem(List lst)
     if (lst == NULL)
         return NULL;
 
-    if (IsListEmpty(lst))
+    if (isListEmpty(lst))
         return NULL;
 
     LIST *l = (LIST *)lst;
@@ -272,9 +272,9 @@ void destroyList(List lst, void (*destroyElement)())
 
     if (destroyElement != NULL)
     {
-        while (!IsListEmpty(lst))
+        while (!isListEmpty(lst))
         {
-            destroyElement(RemoveItem(lst, GetFirstItem(lst)));
+            destroyElement(removeItem(lst, getFirstItem(lst)));
         }
     }
 
