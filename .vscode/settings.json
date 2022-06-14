@@ -4,6 +4,7 @@
         "forms.h": "c",
         "stdlib.h": "c",
         "strings.h": "c",
-        "stdbool.h": "c"
+        "stdbool.h": "c",
+        "stdio.h": "c"
     }
 }

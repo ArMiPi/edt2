@@ -1,213 +1,283 @@
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <math.h>
+
 #include "list.h"
 
-struct ListNode
+typedef struct _structNode
 {
-    Info *data;
-    struct ListNode *prev;
-    struct ListNode *next;
-};
+    struct _structNode *prev;
+    Info info;
+    struct _structNode *next;
+} NODE;
 
-struct List
+typedef struct _structList
 {
-    int size;
-    ListNode *firstNode;
-    ListNode *lastNode;
-};
+    NODE *head;
+    NODE *tail;
+} LISTMAIUSCULO;
 
-void *getInfoList(ListNode *node)
+NODE *newItem()
 {
-    return node->data;
-}
-
-List *createList()
-{
-    List *list = (List *)malloc(sizeof(List));
-    list->size = 0;
-    list->firstNode = NULL;
-    list->lastNode = NULL;
-    return (list);
-}
-
-ListNode *createListNode(Info *data)
-{
-    ListNode *node = (ListNode *)malloc(sizeof(ListNode));
-    node->data = data;
-    node->prev = NULL;
-    node->next = NULL;
-    return (node);
-}
-
-bool isEmptyList(List *list)
-{
-    return list->size == 0;
-}
-
-void addFirstNodeToList(ListNode *node, List *list)
-{
-    list->firstNode = node;
-    list->lastNode = node;
-    list->size++;
-}
-
-void addNthNodeToList(ListNode *node, List *list)
-{
-    ListNode *currentLastNode = list->lastNode;
-    currentLastNode->next = node;
-    node->prev = currentLastNode;
-    list->lastNode = node;
-    list->size++;
-}
-
-void addNodeToList(ListNode *node, List *list)
-{
-    if (isEmptyList(list))
+    NODE *lli = (NODE *)malloc(sizeof(NODE));
+    if (lli == NULL)
     {
-        addFirstNodeToList(node, list);
+        printf("ERROR: Could not allocate memory for new list item\n");
+        exit(EXIT_FAILURE);
     }
-    else
-    {
-        addNthNodeToList(node, list);
-    }
+
+    lli->prev = NULL;
+    lli->info = NULL;
+    lli->next = NULL;
+
+    return lli;
 }
 
-void addNodeBeforeNodeToList(ListNode *node, ListNode *nodeReference, List *list)
+List newList()
 {
-    if (nodeReference->prev == NULL)
+    LISTMAIUSCULO *lst = (LISTMAIUSCULO *)malloc(sizeof(LISTMAIUSCULO));
+    if (lst == NULL)
     {
-        node->next = nodeReference;
-        nodeReference->prev = node;
-        list->firstNode = node;
-        list->size++;
+        printf("ERROR: Could not allocate memory for new list\n");
+        exit(EXIT_FAILURE);
     }
-    else
-    {
-        ListNode *prevNode = nodeReference->prev;
-        ListNode *nextNode = nodeReference;
-        prevNode->next = node;
-        node->prev = prevNode;
-        nextNode->prev = node;
-        node->next = nextNode;
-        list->size++;
-    }
+
+    lst->head = NULL;
+    lst->tail = NULL;
+
+    return lst;
 }
 
-void addNodeAfterNodeToList(ListNode *node, ListNode *prevNode, List *list)
+bool isListEmpty(List lst)
 {
-    ListNode *nextNode = prevNode->next;
-    if (nextNode == NULL)
-    {
-        addNodeToList(node, list);
-    }
-    else
-    {
-        nextNode->prev = node;
-        prevNode->next = node;
-        node->prev = prevNode;
-        node->next = nextNode;
-        list->size++;
-    }
+    if (lst == NULL)
+        return true;
+
+    LISTMAIUSCULO *l = (LISTMAIUSCULO *)lst;
+
+    return l->head == NULL;
 }
 
-ListNode *getFirstNode(List *list)
+int listSize(List lst)
 {
-    return list->firstNode;
+    if (lst == NULL)
+        return 0;
+
+    int size = 0;
+
+    for (List li = GetFirstItem(lst); li != NULL; li = GetNextItem(li))
+        size++;
+
+    return size;
 }
 
-ListNode *getNextNode(ListNode *node)
+Node insertStart(List lst, Info info)
 {
-    return node->next;
+    if (lst == NULL || info == NULL)
+        return NULL;
+
+    LISTMAIUSCULO *l = (LISTMAIUSCULO *)lst;
+
+    // Criar novo item
+    NODE *lli = NewItem();
+    lli->info = info;
+    lli->next = l->head;
+
+    // Posicionar novo item
+    if (!IsListEmpty(lst))
+        l->head->prev = lli;
+    l->head = lli;
+
+    // Verificar se tail == NULL
+    if (l->tail == NULL)
+        l->tail = l->head;
+
+    return lli;
 }
 
-void printAllList(List *list)
+Node insertEnd(List lst, Info info)
 {
-    ListNode *currentNode = list->firstNode;
-    if (isEmptyList(list))
-    {
+    if (lst == NULL || info == NULL)
+        return NULL;
+
+    if (IsListEmpty(lst))
+        return InsertStart(lst, info);
+
+    // Criar novo item
+    NODE *lli = NewItem();
+    lli->info = info;
+
+    // Posicionar novo item
+    NODE *last = GetLastItem(lst);
+    last->next = lli;
+    lli->prev = last;
+
+    // Atualizar valor de tail
+    LISTMAIUSCULO *l = (LISTMAIUSCULO *)lst;
+    l->tail = lli;
+
+    return lli;
+}
+
+Node insertAfter(List lst, Node li, Info info)
+{
+    if (lst == NULL || li == NULL || info == NULL)
+        return NULL;
+
+    if (GetLastItem(lst) == li)
+        return InsertEnd(lst, info);
+
+    // Criar novo item
+    NODE *lli = NewItem();
+    lli->info = info;
+
+    // Posicionar item
+    NODE *llit = (NODE *)li;
+
+    lli->prev = llit;
+    lli->next = llit->next;
+
+    llit->next->prev = lli;
+    llit->next = lli;
+
+    return lli;
+}
+
+Node insertBefore(List lst, Node li, Info info)
+{
+    if (lst == NULL || li == NULL || info == NULL)
+        return NULL;
+
+    if (GetFirstItem(lst) == li)
+        return InsertStart(lst, info);
+
+    // Criar novo item
+    NODE *lli = NewItem();
+    lli->info = info;
+
+    // Posicionar item
+    NODE *llit = (NODE *)li;
+
+    lli->next = llit;
+    lli->prev = llit->prev;
+
+    llit->prev->next = lli;
+    llit->prev = lli;
+
+    return lli;
+}
+
+Info removeItem(List lst, Node li)
+{
+    if (lst == NULL || li == NULL)
+        return NULL;
+
+    if (IsListEmpty(lst))
+        return NULL;
+
+    // Armazenar elemento que deve ser retornado
+    Info info = GetItemElement(li);
+
+    // Remover elemento da lista
+    LISTMAIUSCULO *l = (LISTMAIUSCULO *)lst;
+    NODE *lli = (NODE *)li;
+
+    if (GetFirstItem(lst) == li)
+        l->head = l->head->next;
+    if (GetLastItem(lst) == li)
+        l->tail = l->tail->prev;
+    if (lli->prev != NULL)
+        lli->prev->next = lli->next;
+    if (lli->next != NULL)
+        lli->next->prev = lli->prev;
+
+    lli->prev = NULL;
+    lli->info = NULL;
+    lli->next = NULL;
+
+    free(lli);
+
+    return info;
+}
+
+Info getItemElement(Node li)
+{
+    if (li == NULL)
+        return NULL;
+
+    NODE *lli = (NODE *)li;
+
+    return lli->info;
+}
+
+Node getFirstItem(List lst)
+{
+    if (lst == NULL)
+        return NULL;
+
+    LISTMAIUSCULO *l = (LISTMAIUSCULO *)lst;
+
+    return l->head;
+}
+
+Node getLastItem(List lst)
+{
+    if (lst == NULL)
+        return NULL;
+
+    if (IsListEmpty(lst))
+        return NULL;
+
+    LISTMAIUSCULO *l = (LISTMAIUSCULO *)lst;
+
+    return l->tail;
+}
+
+Node getNextItem(Node li)
+{
+    if (li == NULL)
+        return NULL;
+
+    NODE *lli = (NODE *)li;
+
+    return lli->next;
+}
+
+Node getPreviousItem(Node li)
+{
+    if (li == NULL)
+        return NULL;
+
+    NODE *lli = (NODE *)li;
+
+    return lli->prev;
+}
+
+Info replaceItem(List li, Info info)
+{
+    if (li == NULL || info == NULL)
+        return NULL;
+
+    NODE *lli = (NODE *)li;
+
+    Info toReturn = lli->info;
+    lli->info = info;
+
+    return toReturn;
+}
+
+void destroyList(List lst, void (*destroyElement)())
+{
+    if (lst == NULL)
         return;
-    }
-    while (currentNode != NULL)
-    {
-        // printInfo(currentNode->data);
-        currentNode = currentNode->next;
-    }
-}
 
-void removeUniqueListNode(ListNode *node, List *list)
-{
-    list->firstNode = NULL;
-    list->lastNode = NULL;
-    list->size--;
-    free(node->data);
-    free(node);
-}
-
-void removeFirstListNode(ListNode *node, List *list)
-{
-    ListNode *firstNode = list->firstNode;
-    ListNode *secondNode = list->firstNode->next;
-
-    list->firstNode = secondNode;
-    if (secondNode != NULL)
+    if (destroyElement != NULL)
     {
-        secondNode->prev = NULL;
+        while (!IsListEmpty(lst))
+        {
+            destroyElement(RemoveItem(lst, GetFirstItem(lst)));
+        }
     }
-    list->size--;
-    free(node->data);
-    free(node);
-}
 
-void removeNthListNode(ListNode *node, List *list)
-{
-    ListNode *prevNode = node->prev;
-    ListNode *nextNode = node->next;
-    prevNode->next = nextNode;
-    nextNode->prev = prevNode;
-    list->size--;
-    free(node->data);
-    free(node);
-}
-
-void removeLastListNode(ListNode *node, List *list)
-{
-    ListNode *prevNode = node->prev;
-    prevNode->next = NULL;
-    list->lastNode = prevNode;
-    list->size--;
-    free(node->data);
-    free(node);
-}
-
-bool removeListNode(ListNode *node, List *list)
-{
-    if (isEmptyList(list))
-    {
-        return false;
-    }
-    else if (list->size == 1)
-    {
-        removeUniqueListNode(node, list);
-    }
-    else if (list->firstNode == node)
-    {
-        removeFirstListNode(node, list);
-    }
-    else if (list->lastNode == node)
-    {
-        removeLastListNode(node, list);
-    }
-    else
-    {
-        removeNthListNode(node, list);
-    }
-    return true;
-}
-
-int getListSize(List *list)
-{
-    return list->size;
+    free(lst);
+    lst = NULL;
 }

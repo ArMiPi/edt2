@@ -2,69 +2,232 @@
 #define LIST_H
 
 #include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
 
-typedef struct ListNode ListNode;
-typedef struct List List;
+/*
+    - Esse módulo tem por objetivo definir uma lista duplamente encadeada
+      bem como funções para manupulá-la
+
+    - Todas as funções que tiverem List, Info e/ou Node como parâmetro de entrada presumem
+      List != NULL && Info != NULL && Node != NULL
+*/
+
+typedef void *List;
+typedef void *Node;
 typedef void *Info;
 
 /*
- * Recebe nó e retorna dado do nó.
- */
-void *getInfoList(ListNode *node);
+    # Saída:
+        - List: Lista
+
+    # Descrição:
+        - Retorna um ponteiro para uma lista vazia
+*/
+List newList();
 
 /*
- * Cria a lista dinâmica.
- */
-List *createList();
+    # Entrada:
+        - lst: Lista
+
+    # Saída:
+        - true
+        - false
+
+    # Descrição:
+        - Retorna true se a l estiver vazia,
+          false caso contrário
+*/
+bool isListEmpty(List lst);
 
 /*
- * Cria um nó de lista dinâmica.
- */
-ListNode *createListNode(Info *data);
+    # Entrada:
+        - lst: Lista
+
+    # Saída:
+        - int
+
+    # Descrição:
+        - Retorna a quantidade de elementos armazenados em lst
+*/
+int listSize(List lst);
 
 /*
- * Adiciona o nó criado à lista dinâmica já criada.
- */
-void addListNodeToList(ListNode *node, List *list);
+    # Entradas:
+        - lst: Lista
+        - elem: Elemento
+
+    # Saída:
+        - item: Struct
+
+    # Descrição:
+        - Insere elem no início da lista
+
+        - Retorna um ponteiro para o Node que foi
+          inserido na lista
+*/
+Node insertStart(List lst, Info elem);
 
 /*
- * Adiciona nó criado antes de determinado nó (referência) na lista dinâmica já criada.
- */
-void addNodeBeforeNodeToList(ListNode *node, ListNode *nodeReference, List *list);
+    # Entradas:
+        - lst: Lista
+        - elem: Elemento
+
+    # Saída:
+        - item: Struct
+
+    # Descrição:
+        - Insere elem no final da lista
+
+        - Retorna um ponteiro para o Node que foi
+          inserido na lista
+
+        - Se isListEmpty(lst) será executada a função
+          insertStart()
+*/
+Node insertEnd(List lst, Info elem);
 
 /*
- * Adiciona nó criado depois de determinado nó (referência) na lista dinâmica já criada.
- */
-void addNodeAfterNodeToList(ListNode *node, ListNode *prevNode, List *list);
+    # Entradas:
+        - lst: Lista
+        - li: Node da lista
+        - elem: Elemento
+
+    # Saída:
+        - item: Struct
+
+    # Descrição:
+        - Insere elem após o Node li da lista
+
+        - Retorna um ponteiro para o Node que foi
+          inserido na lista
+*/
+Node insertAfter(List lst, Node li, Info elem);
 
 /*
- * Pegar o primeiro nó da lista dinâmica.
- */
-ListNode *getFirstNode(List *list);
+    # Entradas:
+        - lst: Lista
+        - li: Node da lista
+        - elem: Elemento
+
+    # Saída:
+        - item: Struct
+
+    # Descrição:
+        - Insere elem antes o Node li da lista
+
+        - Retorna um ponteiro para o Node que foi
+          inserido na lista
+*/
+Node insertBefore(List lst, Node li, Info elem);
 
 /*
- * Recebe um nó determinado e retorno o próximo nó.
- */
-ListNode *getNextListNode(ListNode *node);
+    # Entradas:
+        - lst: Lista
+        - li: Item
+
+    # Saída:
+        - element
+
+    # Descrição:
+        - Remove o Node li da lista e retorna o
+          elemento elem armazenado nesse item
+
+        - Se a lista estiver vazia será retornado
+          NULL
+*/
+Info removeItem(List lst, Node li);
 
 /*
- * Imprime toda a lista dinâmica.
- */
-void printAllList(List *list);
+    # Entrada:
+        - li: Item
+
+    # Saída:
+        - element
+
+    # Descrição:
+        - Retorna o elemento element
+          armazenado em li
+*/
+Info getItemElement(Node li);
 
 /*
- * recebe a lista e o nó a ser removido.
- * retorna verdadeiro se o nó foi removido e falso se não foi.
- */
-bool removeListNode(ListNode *node, List *list);
+    # Entrada:
+        - lst: Lista
+
+    # Saída:
+        - item: Struct
+
+    # Descrição:
+        - Retorna um ponteiro para o primeiro
+          Node da lista
+
+        - Se a lista for vazia será retornado NULL
+*/
+Node getFirstItem(List lst);
 
 /*
- * Recebe uma lista e retorna a quantidade de nós da lista.
- */
-int getListSize(List *list);
+    # Entrada:
+        - lst: Lista
+
+    # Saída:
+        - item: Struct
+
+    # Descrição:
+        - Retorna um ponteiro para o último
+          Node da lista
+
+        - Se a lista for vazia será retornado NULL
+*/
+Node getLastItem(List lst);
+
+/*
+    # Entradas:
+        - li: Item
+
+    # Saída:
+        - item
+
+    # Descrição:
+        - Retorna o próximo Node da lista
+*/
+Node getNextItem(Node li);
+
+/*
+    # Entradas:
+        - li: Item
+
+    # Saída:
+        - item
+
+    # Descrição:
+        - Retorna o Node da lista anterior a li
+*/
+Node getPreviousItem(Node li);
+
+/*
+    # Entradas:
+        - li: Node da lista
+        - elem: Elemento
+
+    # Saída:
+        - elem: Elemento
+
+    # Descrição:
+        - Substitui o elemento armazenado em li por elem e retorna
+          o elemento que foi substituído
+*/
+Info replaceItem(List li, Info elem);
+
+/*
+    # Entradas:
+        - lst: Lista
+        - destroyElement: Função
+
+    # Descrição:
+        - Libera toda a memória utilizada por l
+
+        - Se destroyInfo == NULL os elements de
+          l não terão seus espaços de memória deslocados
+*/
+void destroyList(List lst, void (*destroyElement)());
 
 #endif
