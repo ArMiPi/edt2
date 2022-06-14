@@ -14,7 +14,7 @@ typedef struct _structList
 {
     NODE *head;
     NODE *tail;
-} LISTMAIUSCULO;
+} LIST;
 
 NODE *newItem()
 {
@@ -34,7 +34,7 @@ NODE *newItem()
 
 List newList()
 {
-    LISTMAIUSCULO *lst = (LISTMAIUSCULO *)malloc(sizeof(LISTMAIUSCULO));
+    LIST *lst = (LIST *)malloc(sizeof(LIST));
     if (lst == NULL)
     {
         printf("ERROR: Could not allocate memory for new list\n");
@@ -52,7 +52,7 @@ bool isListEmpty(List lst)
     if (lst == NULL)
         return true;
 
-    LISTMAIUSCULO *l = (LISTMAIUSCULO *)lst;
+    LIST *l = (LIST *)lst;
 
     return l->head == NULL;
 }
@@ -75,7 +75,7 @@ Node insertStart(List lst, Info info)
     if (lst == NULL || info == NULL)
         return NULL;
 
-    LISTMAIUSCULO *l = (LISTMAIUSCULO *)lst;
+    LIST *l = (LIST *)lst;
 
     // Criar novo item
     NODE *lli = NewItem();
@@ -112,7 +112,7 @@ Node insertEnd(List lst, Info info)
     lli->prev = last;
 
     // Atualizar valor de tail
-    LISTMAIUSCULO *l = (LISTMAIUSCULO *)lst;
+    LIST *l = (LIST *)lst;
     l->tail = lli;
 
     return lli;
@@ -178,7 +178,7 @@ Info removeItem(List lst, Node li)
     Info info = GetItemElement(li);
 
     // Remover elemento da lista
-    LISTMAIUSCULO *l = (LISTMAIUSCULO *)lst;
+    LIST *l = (LIST *)lst;
     NODE *lli = (NODE *)li;
 
     if (GetFirstItem(lst) == li)
@@ -214,7 +214,7 @@ Node getFirstItem(List lst)
     if (lst == NULL)
         return NULL;
 
-    LISTMAIUSCULO *l = (LISTMAIUSCULO *)lst;
+    LIST *l = (LIST *)lst;
 
     return l->head;
 }
@@ -227,7 +227,7 @@ Node getLastItem(List lst)
     if (IsListEmpty(lst))
         return NULL;
 
-    LISTMAIUSCULO *l = (LISTMAIUSCULO *)lst;
+    LIST *l = (LIST *)lst;
 
     return l->tail;
 }
