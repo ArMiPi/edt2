@@ -20,7 +20,7 @@
         - Abre um arquivo name.txt em path para
           escrita
 */
-FILE *createTXT(String path, String name) 
+FILE *createTXT(String path, String name)
 {
     if(path == NULL || name == NULL) 
         return NULL;
@@ -57,7 +57,7 @@ FILE *createTXT(String path, String name)
         - Escreve os conteúdos de command e toReport em txt
         - txt != NULL
 */
-void reportTXT(FILE *txt, String command, String toReport) 
+void reportTXT(FILE *txt, String command, String toReport)
 {
     if(txt == NULL) 
         return;
@@ -68,20 +68,6 @@ void reportTXT(FILE *txt, String command, String toReport)
     fprintf(txt, "[*] %s\n", command);
     if(toReport != NULL) 
         fprintf(txt, "%s\n\n", toReport);
-}
-
-/*
-    # Entradas:
-        - v: Nível de agressividade
-        - database: Árvore contendo as formas
-    
-    # Descrição:
-        - Atribui o nível de agressividade v às regiões de ataque
-
-*/
-void na(double v, XyyTree database) 
-{
-
 }
 
 /*
@@ -99,9 +85,10 @@ void na(double v, XyyTree database)
                ou cinza (em caso de erro)
 
 */
-String tp(double x, double y, XyyTree database) 
+String tp(double x, double y, XyyTree database)
 {
-
+    if(database == NULL)
+        return NULL;
 }
 
 /*
@@ -127,9 +114,10 @@ String tp(double x, double y, XyyTree database)
         - SVG: Colocar um @ no ponto (x, y)  
 
 */
-String tr(double x, double y, double dx, double dy, int id, XyyTree database) 
+String tr(double x, double y, double dx, double dy, int id, XyyTree database)
 {
-
+    if(database == NULL)
+        return NULL;
 }
 
 /*
@@ -137,6 +125,7 @@ String tr(double x, double y, double dx, double dy, int id, XyyTree database)
         - x, y: Coordenada
         - w: Largura
         - h: Altura
+        - agressividade: Agressividade
         - database: Árvore contendo as formas
     
     # Saída:
@@ -155,9 +144,10 @@ String tr(double x, double y, double dx, double dy, int id, XyyTree database)
 
 
 */
-String be(double x, double y, double w, double h, XyyTree database) 
+String be(double x, double y, double w, double h, double agressividade, XyyTree database)
 {
-
+    if(database == NULL)
+        return NULL;
 }
 
 void executeQry(String BSD, String geoName, String qryName, XyyTree database) {
@@ -199,6 +189,9 @@ void executeQry(String BSD, String geoName, String qryName, XyyTree database) {
     }
     free(fullpath);
 
+    // Nível de Agressividade
+    double agressividade = 0.0;
+
     // Executar os comandos do .qry
     String *splt;
     String command = newEmptyString(MAX_SIZE);
@@ -208,7 +201,7 @@ void executeQry(String BSD, String geoName, String qryName, XyyTree database) {
 
         if(strcmp(splt[0], "na") == 0)
         {
-            na(strtod(splt[1], NULL), database);
+            agressividade = strtod(splt[1], NULL);
         }
         else if(strcmp(splt[0], "tp") == 0)
         {
@@ -222,17 +215,25 @@ void executeQry(String BSD, String geoName, String qryName, XyyTree database) {
         }
         else if(strcmp(splt[0], "be") == 0)
         {
-            toReport = be(strtod(splt[1], NULL), strtod(splt[2], NULL), strtod(splt[3], NULL), strtod(splt[4], NULL), database);
+            toReport = be(strtod(splt[1], NULL), strtod(splt[2], NULL), strtod(splt[3], NULL), strtod(splt[4], NULL), agressividade, database);
             reportTXT(txt, command, toReport);
         }
         else
             printf("ERROR: Unkown command\n");
+
+        // Liberar a memória utilizada por splt
+        for(int i = 0; splt[i] != NULL; i++)
+            free(splt[i]);
+        free(splt);
     }
 
-    if(txt != NULL) fclose(txt);
+    // Fechar arquivos
+    fclose(txt);
+    fclose(qry);
 
     // Criar o svg resultante das qrys
     generateSVG(BSD, resultName, database);
 
     free(resultName);
+    free(command);
 }
