@@ -22,7 +22,6 @@ typedef struct _node
 typedef struct _xyytree
 {
     int size;         // Quantidade de elementos na árvore
-    int dead;         // Quantidade de elementos mortos/inativados na árvore
     double max_decay; // Decaimento máximo da árvore
     NODE *head;       // Raíz da árvore
 } XYYTREE;
@@ -38,7 +37,6 @@ XyyTree newXyyTree(double fd)
 
     // Atribuição de valores
     tree->size = 0;
-    tree->dead = 0;
     tree->max_decay = fd;
     tree->head = NULL;
 
