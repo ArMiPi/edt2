@@ -5,6 +5,7 @@
 #include "qry.h"
 #include "forms.h"
 #include "svg.h"
+#include "list.h"
 
 #define MAX_SIZE 100
 
@@ -62,33 +63,64 @@ void reportTXT(FILE *txt, String command, String toReport)
     if(txt == NULL) 
         return;
 
-    if(command == NULL) 
-        command = "NULL";
-
-    fprintf(txt, "[*] %s\n", command);
+    if(command != NULL) 
+        fprintf(txt, "[*] %s\n", command);
     if(toReport != NULL) 
-        fprintf(txt, "%s\n\n", toReport);
+        fprintf(txt, "%s\n", toReport);
+    if(command == NULL && toReport == NULL)
+        fprintf(txt, "\n");
 }
 
 /*
     # Entradas:
         - x, y: Coordenada
+        - txt: Arquivo txt
         - database: Árvore contendo as formas
-    
-    # Saída:
-        - String: Contém as informações a serem reportadas no .txt
+        - extras: Lista contendo pontos e áreas adicionais geradas dos comandos do .qry
     
     # Descrição:
         - Remover todas as formas para as quais o ponto (x, y) é interno
             
+        - TXT: Reportar todas as informações das formas removidas
+
         - SVG: Marcar o ponto (x, y) com um asterisco vermelho (em caso de acerto),
                ou cinza (em caso de erro)
 
 */
-String tp(double x, double y, XyyTree database)
+void tp(double x, double y, FILE *txt, XyyTree database, List extras)
 {
     if(database == NULL)
         return NULL;
+
+    List hit = getInfosAtingidoPontoXyyT(database, x, y, &isPointInsideForm);
+
+    // Adicionar informações no .txt
+    Form form;
+    int atingidos = 0;
+    for(Node node = getFirstItem(hit); node != NULL; node = getNextItem(node))
+    {
+        form = getInfoXyyT(database, node);
+
+        reportTXT(txt, NULL, reportForm(form));
+
+        atingidos++;
+    }
+    if(atingidos == 0)
+        reportTXT(txt, NULL, "AGUA\n");
+    reportTXT(txt, NULL, NULL);
+
+    // Adicionar ponto no .svg
+    String cor = (atingidos == 0) ? "grey" : "red";
+    String command = newEmptyString(MAX_SIZE);
+    sprintf(command, "t -1 %lf %lf %s %s i *", x, y, cor, cor);
+
+    form = newForm(command);
+    insertEnd(extras, form);
+
+    if(atingidos > 1)
+        sprintf(command, "t -1 %lf %lf %s %s i %d", x+1, y, cor, cor, atingidos);
+
+    free(command);
 }
 
 /*
@@ -192,6 +224,9 @@ void executeQry(String BSD, String geoName, String qryName, XyyTree database) {
     // Nível de Agressividade
     double agressividade = 0.0;
 
+    // Lista contendo os "extras" gerados pelos comandos do .qry
+    List extras = newList();
+
     // Executar os comandos do .qry
     String *splt;
     String command = newEmptyString(MAX_SIZE);
@@ -201,20 +236,23 @@ void executeQry(String BSD, String geoName, String qryName, XyyTree database) {
 
         if(strcmp(splt[0], "na") == 0)
         {
+            reportTXT(txt, command, NULL);
             agressividade = strtod(splt[1], NULL);
         }
         else if(strcmp(splt[0], "tp") == 0)
         {
-            toReport = tp(strtod(splt[1], NULL), strtod(splt[2], NULL), database);
-            reportTXT(txt, command, toReport);
+            reportTXT(txt, command, NULL);
+            tp(strtod(splt[1], NULL), strtod(splt[2], NULL), txt, database, extras);
         }
         else if(strcmp(splt[0], "tr") == 0)
         {
+            // reportTXT(txt, command, NULL);
             toReport = tr(strtod(splt[1], NULL), strtod(splt[2], NULL), strtod(splt[3], NULL), strtod(splt[4], NULL), atoi(splt[5]), database);
             reportTXT(txt, command, toReport);
         }
         else if(strcmp(splt[0], "be") == 0)
         {
+            // reportTXT(txt, command, NULL);
             toReport = be(strtod(splt[1], NULL), strtod(splt[2], NULL), strtod(splt[3], NULL), strtod(splt[4], NULL), agressividade, database);
             reportTXT(txt, command, toReport);
         }
@@ -227,12 +265,14 @@ void executeQry(String BSD, String geoName, String qryName, XyyTree database) {
         free(splt);
     }
 
+    // Calcular as pontuações e inserir no .txt
+
     // Fechar arquivos
     fclose(txt);
     fclose(qry);
 
     // Criar o svg resultante das qrys
-    generateSVG(BSD, resultName, database);
+    generateSVG(BSD, resultName, database, extras);
 
     free(resultName);
     free(command);

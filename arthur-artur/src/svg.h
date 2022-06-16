@@ -1,8 +1,9 @@
 #ifndef SVG_H
 #define SVG_H
 
-#include"strings.h"
-#include"xyytree.h"
+#include "strings.h"
+#include "xyytree.h"
+#include "list.h"
 
 /*
     - Esse módulo tem por objetivo criar um arquivo .svg a partir
@@ -32,6 +33,7 @@
         - path: Path onde o arquivo será criado
         - name: Nome do arquivo que será criado (sem extensão)
         - data: Árvore contendo as formas
+        - appends: Lista gerada pelos comandos do .qry (opcional)
     
     # Descrição:
         - Cria um arquivo name.svg em path com as formas indicadas
@@ -39,6 +41,6 @@
         
         - path != NULL && name != NULL && data != NULL
 */
-void generateSVG(String path, String name, XyyTree data);
+void generateSVG(String path, String name, XyyTree data, List appends);
 
 #endif

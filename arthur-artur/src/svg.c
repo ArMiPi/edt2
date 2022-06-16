@@ -208,7 +208,7 @@ void draw(Info i, double x, double y, void *aux)
     free(splt);
 }
 
-void generateSVG(String path, String name, XyyTree data) 
+void generateSVG(String path, String name, XyyTree data, List appends) 
 {
     if(path == NULL || name == NULL || data == NULL) 
         return;
@@ -218,6 +218,13 @@ void generateSVG(String path, String name, XyyTree data)
         return;
 
     visitaProfundidadeXyyT(data, &draw, fptr);
+
+    // Criar os appends caso necessário
+    if(appends != NULL)
+    {
+        for(Node node = getFirstItem(node); node != NULL; node = getNextItem(node))
+            draw(getItemElement(node), getFormX(getItemElement(node)), getFormY(getItemElement(node)), fptr);
+    }
 
     fprintf(fptr, "</svg>");
 
