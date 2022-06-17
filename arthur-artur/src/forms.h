@@ -130,6 +130,22 @@ bool isPointInsideForm(Form form, double x, double y);
 String reportForm(Form form);
 
 /*
+    # Entradas:
+        - form: Forma a ser clonada
+        - dx, dy: Deslocamento
+		- id: Id da nova forma
+    
+    # Saída:
+        - Form
+    
+    # Descrição:
+        - Retorna uma nova forma, clone de form
+          na posição (x+dx, y+dy) com as cores
+          invertidas
+*/
+Form createClone(Form form, double dx, double dy, int id);
+
+/*
 	# Entrada:
 		- form: Forma
 

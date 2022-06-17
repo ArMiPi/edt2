@@ -5,6 +5,7 @@
         "stdlib.h": "c",
         "strings.h": "c",
         "stdbool.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "xyytree.h": "c"
     }
 }

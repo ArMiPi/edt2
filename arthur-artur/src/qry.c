@@ -86,6 +86,9 @@ void reportTXT(FILE *txt, String command, String toReport)
         - SVG: Marcar o ponto (x, y) com um asterisco vermelho (em caso de acerto),
                ou cinza (em caso de erro)
 
+               Caso mais de uma forma tenha sido atingida, colocar o número de formas
+               atingidas ao lado do ponto
+
 */
 void tp(double x, double y, FILE *txt, XyyTree database, List extras)
 {
@@ -102,6 +105,7 @@ void tp(double x, double y, FILE *txt, XyyTree database, List extras)
         form = getInfoXyyT(database, node);
 
         reportTXT(txt, NULL, reportForm(form));
+        damageFormProtection(form, -1.0);
 
         atingidos++;
     }
@@ -114,13 +118,17 @@ void tp(double x, double y, FILE *txt, XyyTree database, List extras)
     String command = newEmptyString(MAX_SIZE);
     sprintf(command, "t -1 %lf %lf %s %s i *", x, y, cor, cor);
 
-    form = newForm(command);
-    insertEnd(extras, form);
+    insertEnd(extras, newForm(command));
 
     if(atingidos > 1)
+    {
+        command = newEmptyString(MAX_SIZE);
         sprintf(command, "t -1 %lf %lf %s %s i %d", x+1, y, cor, cor, atingidos);
+    }
 
-    free(command);
+    insertEnd(extras, newForm(command));
+
+    destroyList(hit, NULL);
 }
 
 /*
@@ -128,10 +136,9 @@ void tp(double x, double y, FILE *txt, XyyTree database, List extras)
         - x, y: Coordenada
         - dx, dy: Unidades de transladamento
         - id: Identificador inicial
+        - txt: Arquivo txt
         - database: Árvore contendo as formas
-    
-    # Saída:
-        - String: Contém todos os dados das formas clonadas e de seus clones
+        - extras: Lista contendo pontos e áreas adicionais geradas dos comandos do .qry
     
     # Descrição:
         - Cria um clone para cada uma das formas que possuem o ponto interno (x, y)
@@ -143,13 +150,40 @@ void tp(double x, double y, FILE *txt, XyyTree database, List extras)
 
         - O id das novas formas deve começar no valor id
 
+        - TXT: Reportar todos os dados das formas clonadas e de seus clones
+
         - SVG: Colocar um @ no ponto (x, y)  
 
 */
-String tr(double x, double y, double dx, double dy, int id, XyyTree database)
+void tr(double x, double y, double dx, double dy, int id, FILE *txt, XyyTree database, List extras)
 {
     if(database == NULL)
         return NULL;
+    
+    List hit = getInfosAtingidoPontoXyyT(database, x, y, &isPointInsideForm);
+
+    Form form, formToInsert;
+    for(Node node = getFirstItem(hit); node != NULL; node = getNextItem(node))
+    {
+        form = getItemElement(node);
+
+        formToInsert = createClone(form, dx, dy, id);
+        id++;
+
+        insertXyyT(database, getFormX(formToInsert), getFormY(formToInsert), formToInsert);
+
+        reportTXT(txt, NULL, "ORIGINAL:\n");
+        reportTXT(txt, NULL, reportForm(form));
+        reportTXT(txt, NULL, "COPY:\n");
+        reportTXT(txt, NULL, reportForm(formToInsert));
+    }
+
+    String at = newEmptyString(MAX_SIZE);
+    sprintf(at, "t -1 %lf %lf black black i @", x, y);
+
+    insertEnd(extras, at);
+
+    destroyList(hit, NULL);
 }
 
 /*
@@ -246,9 +280,8 @@ void executeQry(String BSD, String geoName, String qryName, XyyTree database) {
         }
         else if(strcmp(splt[0], "tr") == 0)
         {
-            // reportTXT(txt, command, NULL);
-            toReport = tr(strtod(splt[1], NULL), strtod(splt[2], NULL), strtod(splt[3], NULL), strtod(splt[4], NULL), atoi(splt[5]), database);
-            reportTXT(txt, command, toReport);
+            reportTXT(txt, command, NULL);
+            tr(strtod(splt[1], NULL), strtod(splt[2], NULL), strtod(splt[3], NULL), strtod(splt[4], NULL), atoi(splt[5]), txt, database, extras);
         }
         else if(strcmp(splt[0], "be") == 0)
         {

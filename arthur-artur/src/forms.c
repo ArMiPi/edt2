@@ -351,6 +351,72 @@ String reportForm(Form form)
     return report;
 }
 
+Form createClone(Form form, double dx, double dy, int id)
+{
+    if(form == NULL)
+        return NULL;
+    
+    String splt = split(getFormForm(form), " ");
+
+    String command = newEmptyString(100);
+    if(strcmp(splt[0], "c") == 0)
+    {
+        double x = getFormX(form) + dx;
+        double y = getFormY(form) + dy;
+        String r = splt[4];
+        String corb = splt[6];
+        String corp = splt[5];
+
+        sprintf(command, "c %d %lf %lf %s %s %s", id, x, y, r, corb, corp);
+    }
+    else if(strcmp(splt[0], "r") == 0)
+    {
+        double x = getFormX(form) + dx;
+        double y = getFormY(form) + dy;
+        String w = splt[4];
+        String h = splt[5];
+        String corb = splt[7];
+        String corp = splt[6];
+
+        sprintf(command, "r %d %lf %lf %s %s %s %s", id, x, y, w, h, corb, corp);
+    }
+    else if(strcmp(splt[0], "l") == 0)
+    {
+        double x1 = strtod(splt[2], NULL) + dx;
+        double y1 = strtod(splt[3], NULL) + dy;
+        double x2 = strtod(splt[4], NULL) + dx;
+        double y2 = strtod(splt[5], NULL) + dy;
+
+        sprintf(command, "l %d %lf %lf %lf %lf %s", id, x1, y1, x2, y2, splt[6]);
+    }
+    else if(strcmp(splt[0], "t") == 0)
+    {
+        double x = strtod(splt[2], NULL) + dx;
+        double y = strtod(splt[3], NULL) + dy;
+        String corb = splt[5];
+        String corp = splt[4];
+        String a = splt[6];
+        String *content = splt;
+        content += 7;
+        int quantity = 0;
+        for(; content[quantity] != NULL; quantity++);
+        String txto = join(quantity, content, " ");
+
+        sprintf(command, "t %d %lf %lf %s %s %s %s", id, x, y, corb, corp, a, txto);
+        
+        free(txto);
+    }
+
+    Form novaForma = newForm(command);
+
+    // Ajustar valores
+    FORM *nfrm = (FORM *) novaForma;
+
+    nfrm->protection = getFormProtection(form);
+
+    return novaForma;
+}
+
 void destroyForm(Form form)
 {
     if(form == NULL)
