@@ -103,6 +103,18 @@ Condition getFormCondition(Form form);
 String getFormForm(Form form);
 
 /*
+	# Entrada:
+		- form: Forma
+
+	# Saída:
+		- double
+
+	# Descrição:
+		- Retorna a área de form
+*/
+double getFormArea(Form form);
+
+/*
 	# Entradas:
 		- form: Forma
 		- x, y: Coordenada
@@ -116,6 +128,20 @@ String getFormForm(Form form);
 		  e false caso contrário
 */
 bool isPointInsideForm(Form form, double x, double y);
+
+/*
+	# Entradas:
+		- form: Forma
+		- (x1, y1) (x2, y2): Coordenadas delimitadoras da área
+	
+	# Saídas:
+		- true
+		- false
+	
+	# Descrição:
+		- Retorna true caso a forma esteja contida na área informada
+*/
+bool isFormInsideArea(Form form, double x1, double y1, double x2, double y2);
 
 /*
 	# Entrada:

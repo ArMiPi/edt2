@@ -1,8 +1,9 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
 
-#include"forms.h"
+#include "forms.h"
 
 typedef struct _form 
 {
@@ -224,6 +225,53 @@ String getFormForm(Form form)
     return frm->form;
 }
 
+double getFormArea(Form form)
+{
+    if(form == NULL)
+        return 0.0;
+    
+    FORM *frm = (FORM *) form;
+
+    double area;
+    String *splt = split(getFormForm(form), " ");
+    if(strcmp(splt[0], "c") == 0)
+    {
+        double r = strtod(splt[4], NULL);
+
+        area = 3.14 * r * r;
+    }
+    else if(strcmp(splt[0], "r") == 0)
+    {
+        double w = strtod(splt[4], NULL);
+        double h = strtod(splt[5], NULL);
+
+        area = w * h;
+    }
+    else if(strcmp(splt[0], "l") == 0)
+    {
+        double x1 = strtod(splt[2], NULL);
+        double y1 = strtod(splt[3], NULL);
+        double x2 = strtod(splt[4], NULL);
+        double y2 = strtod(splt[5], NULL);
+
+        double w = x2 - x1;
+        double h = y2 - y1;
+        double length2 = (w * w) + (h * h);
+
+        area = 0.1 * sqrt(length2);
+    }
+    else if(strcmp(splt[0], "t") == 0)
+    {
+        area = 0.1;
+    }
+
+    for(int i = 0; splt[i] != NULL; i++)
+        free(splt[i]);
+    free(splt);
+
+    return area;
+}
+
 bool isPointInsideForm(Form form, double x, double y)
 {
     if(form == NULL)
@@ -235,7 +283,7 @@ bool isPointInsideForm(Form form, double x, double y)
     bool inside = true;
 
     // Identificar a forma
-    String command = split(getFormForm(form), " ");
+    String *command = split(getFormForm(form), " ");
     if(strcmp(command[0], "c") == 0)
     {
         double radius = strtod(command[4], NULL);
@@ -280,6 +328,68 @@ bool isPointInsideForm(Form form, double x, double y)
     for(int i = 0; command[i] != NULL; i++)
         free(command[i]);
     free(command);
+
+    return inside;
+}
+
+bool isFormInsideArea(Form form, double x1, double y1, double x2, double y2)
+{
+    if(form == NULL)
+        return false;
+    
+    FORM *frm = (FORM *) form;
+
+    bool inside = true;
+    String *splt = split(getFormForm(form), " ");
+    if(strcmp(splt[0], "c") == 0)
+    {
+        double x = strtod(splt[2], NULL);
+        double y = strtod(splt[3], NULL);
+        double r = strtod(splt[4], NULL);
+
+        if(x-r < x1 || x+r > x2)
+            inside = false;
+        if(y-r < y1 || y+r > y2)
+            inside = false;
+    }
+    else if(strcmp(splt[0], "r") == 0)
+    {
+        double x = strtod(splt[2], NULL);
+        double y = strtod(splt[3], NULL);
+        double w = strtod(splt[4], NULL);
+        double h = strtod(splt[5], NULL);
+
+        if(x < x1 || x+w > x2)
+            inside = false;
+        if(y < y1 || y+h > y2)
+            inside = false;
+    }
+    else if(strcmp(splt[0], "l") == 0)
+    {
+        double xl1 = strtod(splt[2], NULL);
+        double yl1 = strtod(splt[3], NULL);
+        double xl2 = strtod(splt[4], NULL);
+        double yl2 = strtod(splt[5], NULL);
+
+        if(xl1 < x1 || xl2 > x2)
+            inside = false;
+        if(yl1 < y1 || yl2 > y2)
+            inside = false;
+    }
+    else if(strcmp(splt[0], "t") == 0)
+    {
+        double x = strtod(splt[2], NULL);
+        double y = strtod(splt[3], NULL);
+
+        if(x < x1 || x > x2)
+            inside = false;
+        if(y < y1 || y > y2)
+            inside = false;
+    }
+
+    for(int i = 0; splt[i] != NULL; i++)
+        free(splt[i]);
+    free(splt);
 
     return inside;
 }
@@ -356,7 +466,7 @@ Form createClone(Form form, double dx, double dy, int id)
     if(form == NULL)
         return NULL;
     
-    String splt = split(getFormForm(form), " ");
+    String *splt = split(getFormForm(form), " ");
 
     String command = newEmptyString(100);
     if(strcmp(splt[0], "c") == 0)

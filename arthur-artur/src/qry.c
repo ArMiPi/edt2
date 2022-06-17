@@ -192,11 +192,9 @@ void tr(double x, double y, double dx, double dy, int id, FILE *txt, XyyTree dat
         - w: Largura
         - h: Altura
         - agressividade: Agressividade
+        - txt: Arquivo txt
         - database: Árvore contendo as formas
-    
-    # Saída:
-        - String: Contém todos os dados das formas atingidas, acrescentar
-                  REMOVIDA para as formas removidas
+        - extras: Lista contendo pontos e áreas adicionais geradas dos comandos do .qry
     
     # Descrição:
         - Formas inteiramente contidas na região devem ter seu nível de proteção diminuído
@@ -205,15 +203,47 @@ void tr(double x, double y, double dx, double dy, int id, FILE *txt, XyyTree dat
         
         - Formas cujo nível de proteção atingir 0 devem ser removidas
 
+        - TXT: Reportar todos os dados das formas atingidas
+               Acrescentar REMOVIDA às formas removidas
+
         - SVG: Desenhar a regiãp com contorno vermelho e sem preenchimento
                Por um ponto vermelho na posição das âncoras das formas atingidas
 
 
 */
-String be(double x, double y, double w, double h, double agressividade, XyyTree database)
+void be(double x, double y, double w, double h, double agressividade, FILE *txt, XyyTree database, List extras)
 {
     if(database == NULL)
         return NULL;
+
+    List hit = getInfosDentroRegiaoXyyT(database, x, y, w, h, &isFormInsideArea);
+
+    double reduction, area;
+    String command;
+    Form form;
+    for(Node node = getFirstItem(hit); node != NULL; node = getNextItem(node))
+    {
+        form = getItemElement(node);
+
+        area = getFormArea(form);
+        reduction = agressividade * area / (w * h);
+        damageFormProtection(form, reduction);
+
+        if(getFormCondition(form) == inactive)
+            reportTXT(txt, NULL, "[REMOVIDA]");
+        reportTXT(txt, NULL, reportForm(form));
+
+        // Adicionar círculos vermelhos nos pontos âncora das formas atingidas
+        command = newEmptyString(MAX_SIZE);
+        sprintf(command, "c -1 %lf %lf 1.00 red red", getFormX(form), getFormY(form));
+
+        insertEnd(extras, newForm(command));
+    }
+
+    command = newEmptyString(MAX_SIZE);
+    sprintf(command, "r -1 %lf %lf %lf %lf red none", x, y, w, h);
+
+    insertEnd(extras, newForm(command));
 }
 
 void executeQry(String BSD, String geoName, String qryName, XyyTree database) {
@@ -285,9 +315,8 @@ void executeQry(String BSD, String geoName, String qryName, XyyTree database) {
         }
         else if(strcmp(splt[0], "be") == 0)
         {
-            // reportTXT(txt, command, NULL);
-            toReport = be(strtod(splt[1], NULL), strtod(splt[2], NULL), strtod(splt[3], NULL), strtod(splt[4], NULL), agressividade, database);
-            reportTXT(txt, command, toReport);
+            reportTXT(txt, command, NULL);
+            be(strtod(splt[1], NULL), strtod(splt[2], NULL), strtod(splt[3], NULL), strtod(splt[4], NULL), agressividade, txt, database, extras);
         }
         else
             printf("ERROR: Unkown command\n");

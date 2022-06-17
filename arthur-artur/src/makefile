@@ -11,7 +11,7 @@ CC_FLAGS = -std=c99					\
 		   -g
 
 # Ligação com as bibliotecas EX: -lm
-#LBFLAGS = -lm
+LBFLAGS = -lm
 
 # wildcard é utilizado para listar os arquivos-fonte no diretório atual
 FONTES = $(wildcard *.c)
@@ -30,7 +30,7 @@ all: $(EXECUTAVEL)
 # Se tivesse algum LBFLAGS:
 #	${CC} -o $@ $^ ${LBFLAGS}
 $(EXECUTAVEL): $(OBJETOS)
-	${CC} -o $@ $^
+	${CC} -o $@ $^ ${LBFLAGS}
 
 # ted.o: ted.c
 #	gcc -c ted.c
@@ -46,19 +46,3 @@ clean:
 #	rm -rf ted
 rmproper: clean
 	rm -rf ${EXECUTAVEL}
-	rm ../../testes/BSD/*.svg
-	rm ../../testes/BSD/*.txt
-
-# run: ted
-#	./ted
-run: ${EXECUTAVEL}
-	./${EXECUTAVEL}
-
-geo: ${EXECUTAVEL}
-
-
-qry: ${EXECUTAVEL}
-
-
-teste: ${EXECUTAVEL}
-	./${EXECUTAVEL}
