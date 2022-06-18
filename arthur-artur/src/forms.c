@@ -229,8 +229,6 @@ double getFormArea(Form form)
 {
     if(form == NULL)
         return 0.0;
-    
-    FORM *frm = (FORM *) form;
 
     double area;
     String *splt = split(getFormForm(form), " ");
@@ -336,8 +334,6 @@ bool isFormInsideArea(Form form, double x1, double y1, double x2, double y2)
 {
     if(form == NULL)
         return false;
-    
-    FORM *frm = (FORM *) form;
 
     bool inside = true;
     String *splt = split(getFormForm(form), " ");
@@ -403,7 +399,7 @@ String reportForm(Form form)
     String *splt = split(command, " ");
 
     String type = getFormType(command);
-    String temp = newEmptyString(100);
+    String temp = newEmptyString(300);
     String report;
 
     if(strcmp(type, "circulo") == 0) {
