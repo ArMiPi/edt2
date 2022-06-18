@@ -72,14 +72,110 @@ void reportTXT(FILE *txt, String command, String toReport)
 }
 
 /*
+    # Entrada:
+        - form: Forma
+    
+    # Saída:
+        - double
+    
+    # Descrição:
+        - Retorna a pontuação por inativação/destruição da forma
+
+        - Se a forma ainda estiver viva, será retornada a pontuação máxima
+          que essa forma pode gerar
+*/
+double points(Form form)
+{
+    if(form == NULL)
+        return 0.0;
+    
+    String command = getFormForm(form);
+
+    if(command[0] == 'c')
+    {
+        if(getFormCondition(form) == inactive)
+            return 75.0;
+        else if(getFormCondition(form) == destroyed)
+        {
+            double area = getFormArea(form);
+            area /= 5.0;
+
+            return 75.0 / area;
+        }
+
+        double max_points = (getFormArea(form) > 5.0) ? 75.0 : 75.0 / (getFormArea(form) / 5);
+
+        return max_points;
+    }
+    else if(command[0] == 'r')
+    {
+        if(getFormCondition(form) == inactive)
+            return 90.0;
+        else if(getFormCondition(form) == destroyed)
+        {
+            double area = getFormArea(form);
+            area /= 5.0;
+
+            return 90.0 / area;
+        }
+
+        double max_points = (getFormArea(form) > 5.0) ? 90.0 : 90.0 / (getFormArea(form) / 5);
+
+        return max_points;
+    }
+    else if(command[0] == 'l')
+    {
+        if(getFormCondition(form) == inactive)
+            return 50.0;
+        else if(getFormCondition(form) == destroyed)
+            return 150.0;
+        
+        return 150;
+    }
+    else if(command[0] == 't')
+    {
+        if(getFormCondition(form) == inactive)
+            return 30.0;
+        else if(getFormCondition(form) == destroyed)
+            return 500.0;
+
+        return 500;
+    }
+
+    return 0.0;
+}
+
+/*
+    # Entradas:
+        - i: Informação de um nó de uma árvore XyyTree
+        - x, y: Coordenada âncora da forma no nó
+        - aux: Pontuação máxima
+    
+    # Descrição:
+        - Soma em aux o valor da pontuação da forma em i
+*/
+void getTreeMaxScore(Info i, double x, double y, void *aux)
+{
+    if(i == NULL)
+        return;
+    
+    *(double *)aux += points(i);
+}
+
+/*
     # Entradas:
         - x, y: Coordenada
         - txt: Arquivo txt
         - database: Árvore contendo as formas
         - extras: Lista contendo pontos e áreas adicionais geradas dos comandos do .qry
     
+    # Saída:
+        - double: Pontuação
+
     # Descrição:
         - Remover todas as formas para as quais o ponto (x, y) é interno
+
+        - Retorna a pontuação obtida
             
         - TXT: Reportar todas as informações das formas removidas
 
@@ -90,12 +186,14 @@ void reportTXT(FILE *txt, String command, String toReport)
                atingidas ao lado do ponto
 
 */
-void tp(double x, double y, FILE *txt, XyyTree database, List extras)
+double tp(double x, double y, FILE *txt, XyyTree database, List extras)
 {
     if(database == NULL)
-        return NULL;
+        return 0.0;
 
     List hit = getInfosAtingidoPontoXyyT(database, x, y, &isPointInsideForm);
+
+    double score = 0.0;
 
     // Adicionar informações no .txt
     Form form;
@@ -108,6 +206,7 @@ void tp(double x, double y, FILE *txt, XyyTree database, List extras)
         damageFormProtection(form, -1.0);
 
         atingidos++;
+        score += points(form);
     }
     if(atingidos == 0)
         reportTXT(txt, NULL, "AGUA\n");
@@ -129,6 +228,8 @@ void tp(double x, double y, FILE *txt, XyyTree database, List extras)
     insertEnd(extras, newForm(command));
 
     destroyList(hit, NULL);
+
+    return score;
 }
 
 /*
@@ -140,6 +241,9 @@ void tp(double x, double y, FILE *txt, XyyTree database, List extras)
         - database: Árvore contendo as formas
         - extras: Lista contendo pontos e áreas adicionais geradas dos comandos do .qry
     
+    # Saída:
+        - double: Pontuação extra
+
     # Descrição:
         - Cria um clone para cada uma das formas que possuem o ponto interno (x, y)
 
@@ -150,16 +254,20 @@ void tp(double x, double y, FILE *txt, XyyTree database, List extras)
 
         - O id das novas formas deve começar no valor id
 
+        - Retorna a pontuação máxima que as novas formas criadas podem gerar
+
         - TXT: Reportar todos os dados das formas clonadas e de seus clones
 
         - SVG: Colocar um @ no ponto (x, y)  
 
 */
-void tr(double x, double y, double dx, double dy, int id, FILE *txt, XyyTree database, List extras)
+double tr(double x, double y, double dx, double dy, int id, FILE *txt, XyyTree database, List extras)
 {
     if(database == NULL)
-        return NULL;
+        return 0.0;
     
+    double extraScore = 0.0;
+
     List hit = getInfosAtingidoPontoXyyT(database, x, y, &isPointInsideForm);
 
     Form form, formToInsert;
@@ -176,6 +284,8 @@ void tr(double x, double y, double dx, double dy, int id, FILE *txt, XyyTree dat
         reportTXT(txt, NULL, reportForm(form));
         reportTXT(txt, NULL, "COPY:\n");
         reportTXT(txt, NULL, reportForm(formToInsert));
+
+        extraScore += points(formToInsert);
     }
 
     String at = newEmptyString(MAX_SIZE);
@@ -184,6 +294,8 @@ void tr(double x, double y, double dx, double dy, int id, FILE *txt, XyyTree dat
     insertEnd(extras, at);
 
     destroyList(hit, NULL);
+
+    return extraScore;
 }
 
 /*
@@ -211,14 +323,14 @@ void tr(double x, double y, double dx, double dy, int id, FILE *txt, XyyTree dat
 
 
 */
-void be(double x, double y, double w, double h, double agressividade, FILE *txt, XyyTree database, List extras)
+double be(double x, double y, double w, double h, double agressividade, FILE *txt, XyyTree database, List extras)
 {
     if(database == NULL)
-        return NULL;
+        return 0.0;
 
     List hit = getInfosDentroRegiaoXyyT(database, x, y, w, h, &isFormInsideArea);
 
-    double reduction, area;
+    double reduction, area, score;
     String command;
     Form form;
     for(Node node = getFirstItem(hit); node != NULL; node = getNextItem(node))
@@ -238,12 +350,17 @@ void be(double x, double y, double w, double h, double agressividade, FILE *txt,
         sprintf(command, "c -1 %lf %lf 1.00 red red", getFormX(form), getFormY(form));
 
         insertEnd(extras, newForm(command));
+
+        if(getFormCondition(form) == inactive)
+            score += points(form);
     }
 
     command = newEmptyString(MAX_SIZE);
     sprintf(command, "r -1 %lf %lf %lf %lf red none", x, y, w, h);
 
     insertEnd(extras, newForm(command));
+
+    return score;
 }
 
 void executeQry(String BSD, String geoName, String qryName, XyyTree database) {
@@ -291,6 +408,14 @@ void executeQry(String BSD, String geoName, String qryName, XyyTree database) {
     // Lista contendo os "extras" gerados pelos comandos do .qry
     List extras = newList();
 
+    // Controladores para a pontuação
+    double score = 0.0;
+    double max_score = 0.0;
+    int aggressions = 0;
+
+    // Calcular max_score
+    visitaLarguraXyyT(database, &getTreeMaxScore, &max_score);
+
     // Executar os comandos do .qry
     String *splt;
     String command = newEmptyString(MAX_SIZE);
@@ -306,17 +431,17 @@ void executeQry(String BSD, String geoName, String qryName, XyyTree database) {
         else if(strcmp(splt[0], "tp") == 0)
         {
             reportTXT(txt, command, NULL);
-            tp(strtod(splt[1], NULL), strtod(splt[2], NULL), txt, database, extras);
+            score += tp(strtod(splt[1], NULL), strtod(splt[2], NULL), txt, database, extras);
         }
         else if(strcmp(splt[0], "tr") == 0)
         {
             reportTXT(txt, command, NULL);
-            tr(strtod(splt[1], NULL), strtod(splt[2], NULL), strtod(splt[3], NULL), strtod(splt[4], NULL), atoi(splt[5]), txt, database, extras);
+            max_score += tr(strtod(splt[1], NULL), strtod(splt[2], NULL), strtod(splt[3], NULL), strtod(splt[4], NULL), atoi(splt[5]), txt, database, extras);
         }
         else if(strcmp(splt[0], "be") == 0)
         {
             reportTXT(txt, command, NULL);
-            be(strtod(splt[1], NULL), strtod(splt[2], NULL), strtod(splt[3], NULL), strtod(splt[4], NULL), agressividade, txt, database, extras);
+            score += be(strtod(splt[1], NULL), strtod(splt[2], NULL), strtod(splt[3], NULL), strtod(splt[4], NULL), agressividade, txt, database, extras);
         }
         else
             printf("ERROR: Unkown command\n");
@@ -325,9 +450,18 @@ void executeQry(String BSD, String geoName, String qryName, XyyTree database) {
         for(int i = 0; splt[i] != NULL; i++)
             free(splt[i]);
         free(splt);
+
+        aggressions++;
     }
 
-    // Calcular as pontuações e inserir no .txt
+    // Reportar pontuação
+    String toReport = newEmptyString(MAX_SIZE);
+    sprintf(toReport, "PONTUAÇÃO TOTAL: %lf", score);
+    reportTXT(txt, NULL, toReport);
+    sprintf(toReport, "PONTOS OBTIDOS / PONTUAÇÃO MÁXIMA: %lf / %lf", score, max_score);
+    reportTXT(txt, NULL, toReport);
+    sprintf(toReport, "PONTOS OBTIDOS / NÚMERO DE AGRESSÕES: %lf / %lf", score, aggressions);
+    reportTXT(txt, NULL, toReport);
 
     // Fechar arquivos
     fclose(txt);
@@ -338,4 +472,5 @@ void executeQry(String BSD, String geoName, String qryName, XyyTree database) {
 
     free(resultName);
     free(command);
+    free(toReport);
 }
