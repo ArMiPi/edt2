@@ -66,11 +66,11 @@ void drawCircle(FILE *fptr, String *splt)
     if(fptr == NULL || splt == NULL) 
         return;
 
-    String x = getSubstring(splt, 2);
-    String y = getSubstring(splt, 3);
-    String r = getSubstring(splt, 4);
-    String corb = getSubstring(splt, 5);
-    String corp = getSubstring(splt, 6);
+    String x = splt[2];
+    String y = splt[3];
+    String r = splt[4];
+    String corb = splt[5];
+    String corp = splt[6];
 
     fprintf(fptr, "\t<circle style=\"fill:%s; fill-opacity:%s; ", corp, FILL_OPACITY);
     fprintf(fptr, "stroke=%s; stroke-width=%s;\" ", corb, STROKE_WIDTH);
@@ -94,12 +94,12 @@ void drawRectangle(FILE *fptr, String *splt)
     if(fptr == NULL || splt == NULL) 
         return;
 
-    String x = getSubstring(splt, 2);
-    String y = getSubstring(splt, 3);
-    String w = getSubstring(splt, 4);
-    String h = getSubstring(splt, 5);
-    String corb = getSubstring(splt, 6);
-    String corp = getSubstring(splt, 7);
+    String x = splt[2];
+    String y = splt[3];
+    String w = splt[4];
+    String h = splt[5];
+    String corb = splt[6];
+    String corp = splt[7];
 
     fprintf(fptr, "\t<rect style=\"fill:%s; fill-opacity:%s; ", corp, FILL_OPACITY);
     fprintf(fptr, "stroke:%s\" ", corb);
@@ -124,11 +124,11 @@ void drawLine(FILE *fptr, String *splt)
     if(fptr == NULL || splt == NULL) 
         return;
 
-    String x1 = getSubstring(splt, 2);
-    String y1 = getSubstring(splt, 3);
-    String x2 = getSubstring(splt, 4);
-    String y2 = getSubstring(splt, 5);
-    String cor = getSubstring(splt, 6);
+    String x1 = splt[2];
+    String y1 = splt[3];
+    String x2 = splt[4];
+    String y2 = splt[5];
+    String cor = splt[6];
 
     fprintf(fptr, "\t<line x1=\"%s\" y1=\"%s\" ", x1, y1);
     fprintf(fptr, "x2=\"%s\" y2=\"%s\" ", x2, y2);
@@ -150,14 +150,17 @@ void drawText(FILE *fptr, String *splt)
     if(fptr == NULL || splt == NULL) 
         return;
 
-    String x = getSubstring(splt, 2);
-    String y = getSubstring(splt, 3);
-    String corb = getSubstring(splt, 4);
-    String corp = getSubstring(splt, 5);
-    String a = getSubstring(splt, 6);
-    String *content = getAllSubstrings(splt);
+    String x = splt[2];
+    String y = splt[3];
+    String corb = splt[4];
+    String corp = splt[5];
+    String a = splt[6];
+    String *content = splt;
     content += 7;
-    String txto = join((getNumSubstrings(splt) - 7), content, " ");
+    int size = 0;
+    for(int i = 0; splt[i] != NULL; i++)
+        size++;
+    String txto = join(size, content, " ");
 
     String anchor;
     if(strcmp(a, "i") == 0) 
@@ -222,7 +225,7 @@ void generateSVG(String path, String name, XyyTree data, List appends)
     // Criar os appends caso necessário
     if(appends != NULL)
     {
-        for(Node node = getFirstItem(node); node != NULL; node = getNextItem(node))
+        for(Node node = getFirstItem(appends); node != NULL; node = getNextItem(node))
             draw(getItemElement(node), getFormX(getItemElement(node)), getFormY(getItemElement(node)), fptr);
     }
 

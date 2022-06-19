@@ -383,7 +383,7 @@ void executeQry(String BSD, String geoName, String qryName, XyyTree database) {
         nameSize++;
     String names[2];
     names[0] = geoName;
-    names[1] = nameSize - 1;
+    names[1] = name[nameSize - 1];
 
     String resultName = join(2, names, "-");
 
@@ -471,7 +471,7 @@ void executeQry(String BSD, String geoName, String qryName, XyyTree database) {
     reportTXT(txt, NULL, toReport);
     sprintf(toReport, "PONTOS OBTIDOS / PONTUAÇÃO MÁXIMA: %lf / %lf", score, max_score);
     reportTXT(txt, NULL, toReport);
-    sprintf(toReport, "PONTOS OBTIDOS / NÚMERO DE AGRESSÕES: %lf / %lf", score, aggressions);
+    sprintf(toReport, "PONTOS OBTIDOS / NÚMERO DE AGRESSÕES: %lf / %d", score, aggressions);
     reportTXT(txt, NULL, toReport);
 
     // Fechar arquivos
