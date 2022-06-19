@@ -7,7 +7,7 @@
 #include "svg.h"
 #include "list.h"
 
-#define MAX_SIZE 100
+#define MAX_SIZE 200
 
 /*
     # Entradas:
@@ -200,7 +200,10 @@ double tp(double x, double y, FILE *txt, XyyTree database, List extras)
     int atingidos = 0;
     for(Node node = getFirstItem(hit); node != NULL; node = getNextItem(node))
     {
-        form = getInfoXyyT(database, node);
+        form = getItemElement(node);
+
+        if(getFormCondition(form) == inactive || getFormCondition(form) == destroyed)
+            continue;
 
         reportTXT(txt, NULL, reportForm(form));
         damageFormProtection(form, -1.0);
@@ -223,9 +226,9 @@ double tp(double x, double y, FILE *txt, XyyTree database, List extras)
     {
         command = newEmptyString(MAX_SIZE);
         sprintf(command, "t -1 %lf %lf %s %s i %d", x+1, y, cor, cor, atingidos);
-    }
 
-    insertEnd(extras, newForm(command));
+        insertEnd(extras, newForm(command));
+    }
 
     destroyList(hit, NULL);
 
@@ -274,6 +277,9 @@ double tr(double x, double y, double dx, double dy, int id, FILE *txt, XyyTree d
     for(Node node = getFirstItem(hit); node != NULL; node = getNextItem(node))
     {
         form = getItemElement(node);
+
+        if(getFormCondition(form) == inactive || getFormCondition(form) == destroyed)
+            continue;
 
         formToInsert = createClone(form, dx, dy, id);
         id++;
@@ -337,6 +343,9 @@ double be(double x, double y, double w, double h, double agressividade, FILE *tx
     {
         form = getItemElement(node);
 
+        if(getFormCondition(form) == inactive || getFormCondition(form) == destroyed)
+            continue;
+
         area = getFormArea(form);
         reduction = agressividade * area / (w * h);
         damageFormProtection(form, reduction);
@@ -366,19 +375,21 @@ double be(double x, double y, double w, double h, double agressividade, FILE *tx
 void executeQry(String BSD, String geoName, String qryName, XyyTree database) {
     if(BSD == NULL || geoName == NULL || qryName == NULL || database == NULL) 
         return;
-    
-    // String a ser inserida no .txt
-    String toReport;
 
     // Nome dos arquivos .txt e .svg resultantes da consulta
     String *name = split(qryName, "/");
+    int nameSize = 0;
+    for(int i = 0; name[i] != NULL; i++)
+        nameSize++;
     String names[2];
     names[0] = geoName;
-    names[1] = getSubstring(name, getNumSubstrings(name)-1);
+    names[1] = nameSize - 1;
 
     String resultName = join(2, names, "-");
 
-    destroySplited(name);
+    for(int i = 0; name[i] != NULL; i++)
+        free(name[i]);
+    free(name);
     
     // txt de saída utilizado por algumas qrys
     FILE *txt = createTXT(BSD, resultName);
