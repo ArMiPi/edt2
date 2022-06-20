@@ -464,7 +464,7 @@ Form createClone(Form form, double dx, double dy, int id)
     
     String *splt = split(getFormForm(form), " ");
 
-    String command = newEmptyString(100);
+    String command = newEmptyString(200);
     if(strcmp(splt[0], "c") == 0)
     {
         double x = getFormX(form) + dx;

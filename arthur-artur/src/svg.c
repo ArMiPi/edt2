@@ -158,7 +158,7 @@ void drawText(FILE *fptr, String *splt)
     String *content = splt;
     content += 7;
     int size = 0;
-    for(int i = 0; splt[i] != NULL; i++)
+    for(int i = 0; content[i] != NULL; i++)
         size++;
     String txto = join(size, content, " ");
 
@@ -192,8 +192,8 @@ void draw(Info i, double x, double y, void *aux)
 {
     if(i == NULL)
         return;
-    
     String command = getFormForm(i);
+    // printf("%s\n", command);
 
     String *splt = split(command, " ");
 

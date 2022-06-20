@@ -258,8 +258,6 @@ Node getNodeXyyT(XyyTree t, double x, double y, double epsilon)
     return searchXyyTree(tree->head, x, y, epsilon);
 }
 
-// ------------------------------------------
-
 void removeNoXyyT(XyyTree t, Node n)
 {
     // TODO:
@@ -267,30 +265,241 @@ void removeNoXyyT(XyyTree t, Node n)
 
 Info getInfoXyyT(XyyTree t, Node n)
 {
-    // TODO:
+    if(n == NULL)
+        return NULL;
+    
+    NODE *node = (NODE *) n;
+
+    return node->data;
+}
+
+void nodeRegiao(List lst, Node node, double x1, double y1, double x2, double y2)
+{
+    if(node == NULL)
+        return;
+
+    NODE *nd = (NODE *) node;
+
+    double x = getNodeX(node);
+    double y = getNodeY(node);
+
+    if((x >= x1 && x <= x2) && (y >= y1 && y <= y2))
+    {
+        insertEnd(lst, node);
+        nodeRegiao(lst, nd->left, x1, y1, x2, y2);
+        nodeRegiao(lst, nd->center, x1, y1, x2, y2);
+        nodeRegiao(lst, nd->right, x1, y1, x2, y2);
+    }
+    else if(x < x1)
+    {
+        if(y > y2)
+        {
+            nodeRegiao(lst, nd->center, x1, y1, x2, y2);
+        }
+        else if(y < y1)
+        {
+            nodeRegiao(lst, nd->right, x1, y1, x2, y2);
+        }
+        else
+        {
+            nodeRegiao(lst, nd->center, x1, y1, x2, y2);
+            nodeRegiao(lst, nd->right, x1, y1, x2, y2);
+        }
+    }
+    else if(x > x2)
+    {
+        nodeRegiao(lst, nd->left, x1, y1, x2, y2);
+    }
+    else
+    {
+        if(y > y2)
+        {
+            nodeRegiao(lst, nd->left, x1, y1, x2, y2);
+            nodeRegiao(lst, nd->center, x1, y1, x2, y2);
+        }
+        else
+        {
+            nodeRegiao(lst, nd->left, x1, y1, x2, y2);
+            nodeRegiao(lst, nd->right, x1, y1, x2, y2);
+        }
+    }
+}
+
+void infoRegiao(List lst, Node node, double x1, double y1, double x2, double y2, FdentroDe f)
+{
+    if(node == NULL)
+        return;
+    
+    NODE *nd = (NODE *) node;
+
+    double x = getNodeX(node);
+    double y = getNodeY(node);
+
+    if(f(nd->data, x1, y1, x2, y2))
+    {
+        insertEnd(lst, nd->data);
+        infoRegiao(lst, nd->left, x1, y1, x2, y2, f);
+        infoRegiao(lst, nd->center, x1, y1, x2, y2, f);
+        infoRegiao(lst, nd->right, x1, y1, x2, y2, f);
+    }
+    else if(x < x1)
+    {
+        if(y > y2)
+        {
+            infoRegiao(lst, nd->center, x1, y1, x2, y2, f);
+        }
+        else if(y < y1)
+        {
+            infoRegiao(lst, nd->right, x1, y1, x2, y2, f);
+        }
+        else
+        {
+            infoRegiao(lst, nd->center, x1, y1, x2, y2, f);
+            infoRegiao(lst, nd->right, x1, y1, x2, y2, f);
+        }
+    }
+    else if(x > x2)
+    {
+        infoRegiao(lst, nd->left, x1, y1, x2, y2, f);
+    }
+    else
+    {
+        if(y > y2)
+        {
+            infoRegiao(lst, nd->left, x1, y1, x2, y2, f);
+            infoRegiao(lst, nd->center, x1, y1, x2, y2, f);
+        }
+        else
+        {
+            infoRegiao(lst, nd->left, x1, y1, x2, y2, f);
+            infoRegiao(lst, nd->right, x1, y1, x2, y2, f);
+        }
+    }
 }
 
 List *getNodesDentroRegiaoXyyT(XyyTree t, double x1, double y1, double x2, double y2)
 {
-    // TODO:
+    if(t == NULL)
+        return NULL;
+    
+    List dentroRegiao = newList();
+
+    XYYTREE *tree = (XYYTREE *) t;
+
+    nodeRegiao(dentroRegiao, tree->head, x1, y1, x2, y2);
+
+    return dentroRegiao;
 }
 
 List *getInfosDentroRegiaoXyyT(XyyTree t, double x1, double y1, double x2, double y2, FdentroDe f)
 {
-    // TODO:
+    if(t == NULL)
+        return NULL;
+    
+    List dentroRegiao = newList();
+
+    XYYTREE *tree = (XYYTREE *) t;
+
+    infoRegiao(dentroRegiao, tree->head, x1, y1, x2, y2, f);
+
+    return dentroRegiao;
+}
+
+void atingidoPonto(List lst, Node node, double x, double y, FatingidoPor f)
+{
+    if(node == NULL)
+        return;
+    
+    NODE *nd = (NODE *) node;
+
+    if(f(nd->data, x, y))
+        insertEnd(lst, nd->data);
+    
+    if(x < getNodeX(nd))
+        atingidoPonto(lst, nd->left, x, y, f);
+    else
+    {
+        if(y < getNodeY(nd))
+            atingidoPonto(lst, nd->center, x, y, f);
+        else
+            atingidoPonto(lst, nd->right, x, y, f);
+    }
 }
 
 List *getInfosAtingidoPontoXyyT(XyyTree t, double x, double y, FatingidoPor f)
 {
-    // TODO:
+    if(t == NULL)
+        return NULL;
+
+    List atingidos = newList();
+
+    XYYTREE *tree = (XYYTREE *) t;
+
+    atingidoPonto(atingidos, tree->head, x, y, f);
+
+    return atingidos;
+}
+
+void profundidade(Node node, FvisitaNo f, void *aux)
+{
+    if(node == NULL)
+        return;
+    
+    NODE *nd = (NODE *) node;
+    
+    f(nd->data, getNodeX(node), getNodeY(node), aux);
+   
+    profundidade(nd->left, f, aux);
+    profundidade(nd->center, f, aux);
+    profundidade(nd->right, f, aux);
 }
 
 void visitaProfundidadeXyyT(XyyTree t, FvisitaNo f, void *aux)
 {
-    // TODO:
+    if(t == NULL)
+        return;
+    
+    XYYTREE *tree = (XYYTREE *) t;
+    
+    profundidade(tree->head, f, aux);
+    
+}
+
+void largura(List lst, Node node)
+{
+    if(node == NULL)
+        return;
+    
+    NODE *nd = getItemElement(node);
+
+    if(nd->left != NULL)
+        insertEnd(lst, nd->left);
+    if(nd->center != NULL)
+        insertEnd(lst, nd->center);
+    if(nd->right != NULL)
+        insertEnd(lst, nd->right);
+
+    largura(lst, getNextItem(node));
 }
 
 void visitaLarguraXyyT(XyyTree t, FvisitaNo f, void *aux)
 {
-    // TODO:
+    if(t == NULL)
+        return;
+    
+    XYYTREE *tree = (XYYTREE *) t;
+
+    List nodes = newList();
+    insertEnd(nodes, tree->head);
+
+    largura(nodes, getFirstItem(nodes));
+
+    NODE *node;
+    for(Node nd = getFirstItem(nodes); nd != NULL; nd = getNextItem(nd))
+    {
+        node = getItemElement(nd);
+        f(node->data, getNodeX(node), getNodeY(node), aux);
+    }
+
+    destroyList(nodes, NULL);
 }

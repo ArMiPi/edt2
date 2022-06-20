@@ -272,20 +272,20 @@ double tr(double x, double y, double dx, double dy, int id, FILE *txt, XyyTree d
     double extraScore = 0.0;
 
     List hit = getInfosAtingidoPontoXyyT(database, x, y, &isPointInsideForm);
-
+    
     Form form, formToInsert;
     for(Node node = getFirstItem(hit); node != NULL; node = getNextItem(node))
     {
         form = getItemElement(node);
-
+        
         if(getFormCondition(form) == inactive || getFormCondition(form) == destroyed)
             continue;
-
+        
         formToInsert = createClone(form, dx, dy, id);
         id++;
-
+        
         insertXyyT(database, getFormX(formToInsert), getFormY(formToInsert), formToInsert);
-
+        
         reportTXT(txt, NULL, "ORIGINAL:\n");
         reportTXT(txt, NULL, reportForm(form));
         reportTXT(txt, NULL, "COPY:\n");
@@ -297,7 +297,7 @@ double tr(double x, double y, double dx, double dy, int id, FILE *txt, XyyTree d
     String at = newEmptyString(MAX_SIZE);
     sprintf(at, "t -1 %lf %lf black black i @", x, y);
 
-    insertEnd(extras, at);
+    insertEnd(extras, newForm(at));
 
     destroyList(hit, NULL);
 
@@ -324,7 +324,7 @@ double tr(double x, double y, double dx, double dy, int id, FILE *txt, XyyTree d
         - TXT: Reportar todos os dados das formas atingidas
                Acrescentar REMOVIDA às formas removidas
 
-        - SVG: Desenhar a regiãp com contorno vermelho e sem preenchimento
+        - SVG: Desenhar a região com contorno vermelho e sem preenchimento
                Por um ponto vermelho na posição das âncoras das formas atingidas
 
 
@@ -334,7 +334,7 @@ double be(double x, double y, double w, double h, double agressividade, FILE *tx
     if(database == NULL)
         return 0.0;
 
-    List hit = getInfosDentroRegiaoXyyT(database, x, y, w, h, &isFormInsideArea);
+    List hit = getInfosDentroRegiaoXyyT(database, x, y, x+w, y+h, &isFormInsideArea);
 
     double reduction, area, score;
     String command;
@@ -395,23 +395,12 @@ void executeQry(String BSD, String geoName, String qryName, XyyTree database) {
     FILE *txt = createTXT(BSD, resultName);
 
     // Abrir o .qry
-    String fullpath;
-    if(endsWith(BSD, "/")) 
-        fullpath = concat(BSD, qryName);
-    else 
-    {
-        String barPath = concat(BSD, "/");
-        fullpath = concat(barPath, qryName);
-        free(barPath);
-    }
-
-    FILE *qry = fopen(fullpath, "r");
+    FILE *qry = fopen(qryName, "r");
     if(qry == NULL)
     {
-        printf("ERROR: Could not open %s\n", fullpath);
+        printf("ERROR: Could not open %s\n", qryName);
         return;
     }
-    free(fullpath);
 
     // Nível de Agressividade
     double agressividade = 0.0;
@@ -443,16 +432,19 @@ void executeQry(String BSD, String geoName, String qryName, XyyTree database) {
         {
             reportTXT(txt, command, NULL);
             score += tp(strtod(splt[1], NULL), strtod(splt[2], NULL), txt, database, extras);
+            aggressions++;
         }
         else if(strcmp(splt[0], "tr") == 0)
         {
             reportTXT(txt, command, NULL);
             max_score += tr(strtod(splt[1], NULL), strtod(splt[2], NULL), strtod(splt[3], NULL), strtod(splt[4], NULL), atoi(splt[5]), txt, database, extras);
+            aggressions++;
         }
         else if(strcmp(splt[0], "be") == 0)
         {
             reportTXT(txt, command, NULL);
             score += be(strtod(splt[1], NULL), strtod(splt[2], NULL), strtod(splt[3], NULL), strtod(splt[4], NULL), agressividade, txt, database, extras);
+            aggressions++;
         }
         else
             printf("ERROR: Unkown command\n");
@@ -461,8 +453,6 @@ void executeQry(String BSD, String geoName, String qryName, XyyTree database) {
         for(int i = 0; splt[i] != NULL; i++)
             free(splt[i]);
         free(splt);
-
-        aggressions++;
     }
 
     // Reportar pontuação
@@ -484,4 +474,6 @@ void executeQry(String BSD, String geoName, String qryName, XyyTree database) {
     free(resultName);
     free(command);
     free(toReport);
+
+    destroyList(extras, NULL);
 }

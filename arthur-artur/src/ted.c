@@ -5,6 +5,7 @@
 #include "strings.h"
 #include "database.h"
 #include "svg.h"
+#include "qry.h"
 
 int main(int argc, char *argv[]) 
 {
@@ -16,13 +17,26 @@ int main(int argc, char *argv[])
     
     // Criar .svg a partir do .geo
     generateSVG(getBSD(prms), getDBname(geo), getDBdata(geo), NULL);
-
+    
     if(getQRY(prms) != NULL) 
     {
-        // Executar comandos do .qry
-        
+        String qryName;
+        if(endsWith(getBED(prms), "/"))
+            qryName = concat(getBED(prms), getQRY(prms));
+        else
+        {
+            String barpath = concat(getBED(prms), "/");
+            qryName = concat(barpath, getQRY(prms));
 
+            free(barpath);
+        }
+        
+        // Executar comandos do .qry
+        executeQry(getBSD(prms), getDBname(geo), qryName, getDBdata(geo));
+
+        free(qryName);
     }
 
     destroyParams(prms);    
+    destroyDB(geo);
 }
