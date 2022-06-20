@@ -210,6 +210,8 @@ double tp(double x, double y, FILE *txt, XyyTree database, List extras)
 
         atingidos++;
         score += points(form);
+
+        removeNoXyyT(database, getNodeXyyT(database, getFormX(form), getFormY(form), 0.0009));
     }
     if(atingidos == 0)
         reportTXT(txt, NULL, "AGUA\n");

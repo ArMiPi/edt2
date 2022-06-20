@@ -41,7 +41,7 @@ FILE *openFile(String fullpath)
 XyyTree readFile(FILE *fptr)
 {
     // REDO
-    double tempFD = 0.50;
+    double tempFD = 0.30;
     XyyTree tree = newXyyTree(tempFD);
 
     String line = newEmptyString(MAX_SIZE);

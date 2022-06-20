@@ -208,6 +208,7 @@ Node insertXyyT(XyyTree t, double x, double y, Info i)
         inserted = insertNode(tree->head, x, y, i);
     }
 
+    tree->size++;
     return inserted;
 }
 
@@ -258,9 +259,36 @@ Node getNodeXyyT(XyyTree t, double x, double y, double epsilon)
     return searchXyyTree(tree->head, x, y, epsilon);
 }
 
+void countDeaths(Info i, double x, double y, void *aux)
+{
+    if(i == NULL)
+        return;
+    
+    if(getFormCondition(i) != alive)
+        *(int *)aux += 1;
+}
+
+void reconstruct(XyyTree t)
+{
+    Node nodesToReallocate[30];
+}
+
 void removeNoXyyT(XyyTree t, Node n)
 {
-    // TODO:
+    if(t == NULL || n == NULL)
+        return;
+
+    XYYTREE *tree = (XYYTREE *) t;
+    NODE *node = (NODE *) n;
+
+    if(getFormCondition(node->data) == alive)
+        damageFormProtection(node->data, -1);
+    
+    int dead = 0;
+    visitaProfundidadeXyyT(t, &countDeaths, &dead);
+
+    if((double)dead / tree->size >= tree->max_decay)
+        reconstruct(t);
 }
 
 Info getInfoXyyT(XyyTree t, Node n)

@@ -193,7 +193,6 @@ void draw(Info i, double x, double y, void *aux)
     if(i == NULL)
         return;
     String command = getFormForm(i);
-    // printf("%s\n", command);
 
     String *splt = split(command, " ");
 
